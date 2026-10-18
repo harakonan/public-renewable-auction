@@ -1,0 +1,3 @@
+sample,raw_status_K,termination_status_K,objective_value_K,raw_status_b,termination_status_b,objective_value_b
+main,Solve_Succeeded,LOCALLY_SOLVED,0.4331854515092923,Solve_Succeeded,LOCALLY_SOLVED,91.83087445015519
+bootstrap,LOCALLY_SOLVED,LOCALLY_SOLVED,,LOCALLY_SOLVED,LOCALLY_SOLVED,

@@ -1,0 +1,517 @@
+\documentclass[10pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{bbm}
+\usepackage{booktabs}
+\usepackage{float}
+\usepackage{hyperref}
+\usepackage{enumitem}
+
+\title{Counterfactual Auction Computation}
+\author{Konan Hara}
+\date{October 4, 2026}
+
+\begin{document}
+\maketitle
+
+\section{Purpose and Current Status}
+
+This note documents the production counterfactual model and its Julia
+implementation.  The production model replaces the earlier continuous-type
+indirect-inference calculation with two discrete risk-aversion types and a
+common upper bid support.  Interior bidding strategies solve a joint
+inverse-strategy differential system parameterized by the lower-bid
+probability.  Entry follows two
+type-specific cost cutoffs.  The common-support restriction selects a single
+equilibrium branch and avoids alternating between a flexible bid distribution
+and an entry approximation.
+
+The economic objects retained from the preceding implementation are the
+effective-cost interpretation, the wholesale-only outside option, endogenous
+portfolio choice on $[0,1]$, full-project awards, the objective-capacity
+distribution, and policy comparisons with fixed-share auctions.  Capacity is
+independent of $(\gamma,c)$ in the counterfactual type distribution.  The
+factual distribution used to calibrate the registered pool continues to
+preserve the estimated risk-aversion--cost correlation.
+
+The final-precision production run completed on October 4, 2026.  It
+solved all eight primitive specifications, eleven cost shifts, bidder share
+choice, twenty-one fixed shares, and the matched-share comparison.  All 2,024
+distinct equilibria passed the strict pooled-boundary and differential-system
+checks.  The numerical values below are the canonical paper results.
+
+\section{Counterfactual Primitives}
+
+\subsection{Effective Cost and the Outside Option}
+
+Let $\pi_{0i}$ denote bidder $i$'s outside certainty equivalent.  The auction
+bids identify the effective cost
+\begin{equation}
+c_i=c_i^{physical}+\pi_{0i},
+\label{eq:effective_cost}
+\end{equation}
+not its two components separately.  Estimation can therefore remain agnostic
+about the specification of $\pi_{0i}$.  In the counterfactual, a project may
+build entirely in the wholesale market, so
+\begin{equation}
+\pi_{0i}
+=\max\left\{0,\mu_r-c_i^{physical}
+-\frac{\gamma_i\sigma_r^2}{2}\right\}.
+\end{equation}
+A downward physical-cost shift $\Delta c\leq0$ maps the estimated effective
+cost into
+\begin{equation}
+c_i(\Delta c)
+=\max\left\{c_i(0)+\Delta c,
+\mu_r-\frac{\gamma_i\sigma_r^2}{2}\right\}.
+\label{eq:cost_floor}
+\end{equation}
+The lower bound is the effective cost of a wholesale-only project.  A project
+at the bound is viable outside the auction and is counted in total built
+capacity if it does not win auction support.
+
+\subsection{Two Risk-Aversion Types}
+
+The production approximation replaces the continuous distribution of
+$\log\gamma$ with two equally weighted points.  If
+$s_\gamma=\operatorname{SD}(\log\gamma)$, define
+\begin{equation}
+\log\gamma_L=\ell-d,
+\qquad
+\log\gamma_H=\ell+d,
+\qquad
+d=s_\gamma\sqrt{\frac{N-1}{N}},
+\end{equation}
+where $\ell$ is chosen so that the discrete distribution has the maintained
+level mean $E[\gamma]=0.56427$.  The small finite-sample factor makes the
+simulated sample standard deviation equal its target.  The production grid is
+\begin{equation}
+s_\gamma\in\{0.038337,0.088437\}.
+\label{eq:gamma_grid}
+\end{equation}
+The first value is the point estimate.  The second corresponds to
+$\operatorname{SD}(\gamma)=0.05$.  The more extreme bootstrap upper bound is
+excluded from the production grid because it produced unstable winner
+composition over adjacent fixed-share values under the common-support
+approximation.
+
+Conditional cost distributions are generated so the level correlation
+between $\gamma$ and cost equals
+\begin{equation}
+\rho\in\{-0.658,0,0.132847,0.454\}.
+\label{eq:rho_grid}
+\end{equation}
+The primary value is the Table~5 point estimate.  The endpoints are its
+central 95 percent interval.  Capacity is drawn independently from its
+empirical participant-weighted marginal distribution.  Thus capacity affects
+competition and allocation but, conditional on $(\gamma,c)$, not own entry.
+
+Within risk class $g\in\{L,H\}$, define cost above the wholesale floor as
+\begin{equation}
+x=c-\left(\mu_r-\frac{\gamma_g\sigma_r^2}{2}\right)\geq0.
+\label{eq:x_type}
+\end{equation}
+The code represents each conditional distribution $F_g(x)$ by a weighted
+Gaussian kernel distribution.  This smoothing is numerical quadrature for a
+deterministic cutoff, not a behavioral entry shock.
+
+\subsection{Synthetic Auction and Allocation}
+
+The representative auction has the median number of registered projects and
+uses participant-weighted auction primitives.  To construct the objective
+capacity $\widetilde D$, the code simulates baseline sealed-bid auctions,
+fills procurement capacity in units of $q_iCapacity_i$, prorates the marginal
+project, and converts the resulting procurement draw into installed capacity.
+It normalizes each draw by the simulated auction's expected aggregate
+participant capacity and rescales it to the representative auction.  In a
+counterfactual auction, every lower-bidding competitor contributes its full
+$Capacity_j$ toward procurement:
+\begin{equation}
+W(P)=\Pr\left\{
+\sum_{j=1}^{N-1}Capacity_j\mathbbm{1}\{b_j<b\}<\widetilde D
+\right\},
+\label{eq:winprob}
+\end{equation}
+where $P$ is the probability that a potential competitor enters and submits a
+lower bid.  Because capacity is independent of strategic type, the code
+computes $W(P)$ and $W_P(P)$ from the exact binomial mixture over the number of
+lower bidders.  Conditional procurement probabilities are integrated using
+common capacity and $\widetilde D$ draws.  This replaces repeated simulation
+of a nonparametric winning-probability curve.
+
+Awards are made to whole projects.  Realized awarded capacity can therefore
+overshoot $\widetilde D$.  The same full-award rule and common allocation
+random numbers are used in every policy scenario.
+
+\section{Bidder Payoffs and Portfolio Choice}
+
+Utility is measured relative to the outside payoff.  A bidder who wins with
+bid price $b$, purchase-agreement share $q$, and effective cost $c$ receives
+the incremental certainty equivalent
+\begin{equation}
+m(q,b;c,\gamma)
+=q\widetilde\delta b+(1-q)\mu_r-c
+-\frac{\gamma\sigma_r^2}{2}(1-q)^2.
+\label{eq:surplus}
+\end{equation}
+If the bidder loses, incremental utility is $u_i(0)=0$.  The certainty
+equivalent of the auction lottery is therefore
+\begin{equation}
+V
+=-\frac{1}{\gamma_i}\log\left[
+1-W(b)\{1-\exp(-\gamma_i m)\}\right],
+\label{eq:auction_value}
+\end{equation}
+where utility is normalized relative to the outside payoff.  Qualification
+costs $\kappa Capacity_i$.  Since winning surplus and qualification cost both
+scale with own capacity, own capacity cancels from the entry comparison.
+
+In the bidder-share-choice auction,
+\begin{equation}
+q(b,\gamma)
+=\left[
+1-\frac{\mu_r^{share}-\widetilde\delta b}
+{\gamma\sigma_r^2}
+\right]_{0}^{1}.
+\label{eq:q_choice}
+\end{equation}
+For a fixed-share auction, $q=\lambda$.  The case $\lambda=0$ is implemented
+as an explicit subsidy auction; bidders compete in bid price and can win even
+though the purchase-agreement share is zero.
+
+\section{Common-Support Equilibrium}
+
+\subsection{Inverse First-Order Conditions}
+
+Let
+\begin{equation}
+K(b)=-\frac{W(b)}{W'(b)}>0.
+\label{eq:K}
+\end{equation}
+For an interior bid, the bid-price first-order condition implies
+\begin{equation}
+s_g(b,K)
+=\frac{1}{\gamma_g}
+\log\left[1+\gamma_gK(b)m_b(b,\gamma_g)\right],
+\label{eq:surplus_inverse}
+\end{equation}
+where $s_g$ is equilibrium winning surplus and $m_b$ is the derivative of the
+gross winning certainty equivalent with respect to bid.  In the share-choice
+auction $m_b=q_g(b)\widetilde\delta$ by the envelope theorem.  In every
+fixed-share auction, including $\lambda=0$, $m_b=\widetilde\delta$.
+
+Equations \eqref{eq:surplus}--\eqref{eq:surplus_inverse} yield the cost cutoff
+above the outside floor for each risk type:
+\begin{equation}
+x_g(b,K)
+=G_g(b)-s_g(b,K)
+-\left(\mu_r-\frac{\gamma_g\sigma_r^2}{2}\right),
+\label{eq:inverse_cost}
+\end{equation}
+where $G_g(b)$ is gross winning CE before cost.  The probability of an entry
+and bid below $b$ is
+\begin{equation}
+P(b,K)=\sum_{g\in\{L,H\}}\pi_gF_g(x_g(b,K)).
+\label{eq:lower_bid_probability}
+\end{equation}
+
+\subsection{Probability-Parameterized Differential System}
+
+The allocation map gives $W=W(P)$.  Bid price is monotone in cost conditional
+on risk class, and $P$ is a bid CDF, so $P$ must increase with $b$.  Rather
+than asking a fixed-step ODE in bid space to reproduce this restriction, the
+production code uses $P$ itself as the independent variable.  Combining
+$K=-W/(W_PP')$ with equation~\eqref{eq:lower_bid_probability} gives
+\begin{align}
+\frac{db}{dP}
+&=-\frac{W_P(P)K}{W(P)}>0,
+\label{eq:bid_probability_ode}\\
+\frac{dK}{dP}
+&=\frac{1-P_b(b,K)\,db/dP}{P_K(b,K)}.
+\label{eq:K_probability_ode}
+\end{align}
+The system starts at the common upper bid, where $P$ equals the aggregate
+entry probability, and integrates downward to $P=0.0005$.  Fourth-order
+Runge--Kutta steps jointly update $(b,\log K)$.  At every stage, a Newton
+projection imposes equation~\eqref{eq:lower_bid_probability}; the step size is
+bounded both in probability and in its implied bid change.  This makes bid
+monotonicity a property of the computational coordinate rather than an
+ex-post diagnostic.  The code reports
+\begin{equation}
+\max_P\left|P(b(P),K(P))-P\right|
+\label{eq:probability_ode_residual}
+\end{equation}
+as the differential-system residual.  At every accepted node, equation
+\eqref{eq:inverse_cost} recovers both type-specific cost cutoffs.  The
+resulting monotone inverse strategies map each entrant draw into its bid and
+portfolio share.
+
+The common upper bid is a computational approximation.  In an unrestricted
+two-type model the two risk classes could have different upper supports, and
+boundary conditions would require a more elaborate segment-by-segment
+solution.  Requiring a common upper support yields a single pooled lower-bid
+probability at the boundary and makes the probability-parameterized system
+operational.  This is the main simplifying restriction used to retain
+risk-based selection while
+eliminating the unstable high-dimensional fixed point.
+
+\subsection{Boundary Calibration and Continuation}
+
+In each baseline sealed-bid auction, the code approximates the marginal
+participant's bid by the simulated expectation of the maximum of $N_a$ draws
+from that auction's fitted participant bid distribution, where $N_a$ is its
+number of participants.  The participant-count-weighted mean of these
+auction-specific values anchors the representative auction's common upper bid
+at $\bar b=56.76584$.  For a candidate registered-project distribution, the
+code solves $\bar K=-W(\bar b)/W'(\bar b)$ so that
+equation~\eqref{eq:lower_bid_probability} at $(\bar b,\bar K)$ reproduces the
+observed aggregate participation rate.  Let $V_g$ denote the CARA certainty
+equivalent of the auction lottery for marginal type $g$.  The qualification
+cost calibration is
+\begin{equation}
+\log\kappa=\sum_g\pi_g\log V_g.
+\label{eq:kappa}
+\end{equation}
+For the primary primitive specification, this gives the representative
+baseline calibration of $\kappa$.  Each correlation and dispersion sensitivity
+specification is treated in turn as the baseline primitive model and receives
+its own baseline calibration of $\kappa$ at $\Delta c=0$.
+Within a primitive specification, the resulting $\kappa$ is held fixed across
+all cost shifts and auction formats.  Thus policy comparisons never
+recalibrate entry cost, while sensitivity comparisons allow the nuisance
+entry-cost calibration to remain consistent with the observed factual entry
+rate under the alternative primitives.
+
+In a counterfactual scenario, the two boundary variables $(\bar b,\bar K)$
+are required to satisfy the pooled marginal-value condition
+\begin{equation}
+\sum_g\pi_g\log V_g(\bar b,\bar K)=\log\kappa.
+\label{eq:pooled_entry}
+\end{equation}
+One equation does not identify both boundary variables.  The implementation
+selects the point on this level set closest to the translated preceding
+solution:
+\begin{equation}
+\left(\frac{\bar b-\bar b^{pred}}{2}\right)^2
++\left(\frac{\log\bar K-\log\bar K^{pred}}{0.5}\right)^2.
+\label{eq:continuation_metric}
+\end{equation}
+Cost shifts are solved sequentially at
+$\Delta c=0,-1,-2,\ldots,-10$.  The preceding cost solution supplies the next
+prediction.  This continuation metric is a numerical branch-selection rule,
+not an additional behavioral restriction.
+
+Under common support, equation~\eqref{eq:pooled_entry} need not make both
+type-specific marginal values equal $\kappa$.  The code therefore reports
+\begin{equation}
+r_g=\log(V_g/\kappa),\qquad
+R_{RMSE}=\left(\frac{r_L^2+r_H^2}{2}\right)^{1/2},\qquad
+R_{max}=\max_g|r_g|.
+\label{eq:type_residual}
+\end{equation}
+These are approximation diagnostics.  The pooled residual in
+equation~\eqref{eq:pooled_entry}, the residual in
+equation~\eqref{eq:probability_ode_residual}, monotonicity of $b(P)$, and
+positivity of $K$ are strict numerical checks.
+
+\section{Recovering the Registered Pool}
+
+The primitive participant distribution is conditional on participation,
+while participation must be evaluated over registered projects.  For project
+draw $j$, define
+\begin{equation}
+w_j(\alpha)
+=\frac{\exp\{\alpha'h(\gamma_j,c_j)\}}
+{\sum_k\exp\{\alpha'h(\gamma_k,c_k)\}},
+\label{eq:registered_weight}
+\end{equation}
+where $h(\gamma,c)$ contains standardized $\log\gamma$ and cost, their centered
+squares, and their interaction.  These weights describe a candidate
+registered-project distribution.  For each candidate $\alpha$, the code holds
+the baseline marginal-participant bid anchor $\bar b$ fixed, solves $\bar K$
+so that the type-specific cutoffs $\bar x_g(\bar b,\bar K)$ reproduce the
+observed participant--registrant ratio, and applies those cutoffs to the
+weighted draws.  It calibrates $\alpha$ so that the selected draws reproduce
+the primitive participant moments.  Thus the procedure inverts the model's
+participation selection: it recovers the registered-project weights that
+generate the primitive participant distribution after the baseline
+participation cutoffs are applied.
+
+The common boundary then implies the type-specific marginal auction values
+used in equation~\eqref{eq:kappa}.  Each correlation and dispersion sensitivity
+is an alternative baseline calibration and receives its own registered-pool
+weights, $\bar K$, and $\kappa$.  Within a primitive scenario, the recovered
+registered weights and calibrated $\kappa$ are fixed over all cost reductions
+and auction mechanisms.
+
+\section{Policy Outcomes}
+
+The production calculation compares:
+\begin{enumerate}[leftmargin=2em]
+\item bidder share choice;
+\item fixed shares $\lambda=0,0.05,\ldots,1$; and
+\item a fixed share equal to the capacity-weighted winner mean share in the
+corresponding share-choice auction.
+\end{enumerate}
+For every mechanism and cost shift, the code reports entry, entrant and winner
+mean cost, mean risk aversion, the high- and low-risk-type shares, bids, markups, winner
+mean $q$, auction-supported capacity, capacity built without auction support, and total built
+capacity.  The policymaker outcomes are expected net cost and
+\begin{equation}
+CECost_{PM}=E[Cost_{PM}]
++\frac{\gamma_{PM}}{2}\operatorname{Var}(Cost_{PM}),
+\end{equation}
+for $\gamma_{PM}=0$ and $\gamma_{PM}=E[\gamma]$.
+The simulation constructs this object per MWh of objective generation.  The
+paper figures report aggregate policymaker CE in billion dollars by multiplying
+it by $\widetilde D\times 8{,}760\times20$.  Equivalently, this multiplies a
+winner-generation CE net of the small full-award capacity overshoot by total
+winner generation.  The matched-share table reports policymaker CE and the
+capacity-weighted winner markup using the same conversion, in \$100 million.
+
+The matched-share comparison holds average realized public risk exposure
+approximately fixed, but it is not a dominance test.  The matched fixed-share
+auction uses the average share that bidders reveal under endogenous portfolio
+choice and therefore does not preserve their informational advantage from
+choosing $q$ individually.  Moreover, total built capacity can differ across
+the two mechanisms.  Results should be described as combinations of policy
+cost, risk exposure, and construction rather than as a one-dimensional welfare
+ranking.
+
+\section{Production Grid and Computation}
+
+The final-precision settings are
+\begin{center}
+\begin{tabular}{lr}
+\toprule
+Object & Draws\\
+\midrule
+Auxiliary primitive draws & 5,000\\
+Winning-probability/allocation-map simulations & 1,000\\
+Allocation simulations & 2,000\\
+$\widetilde D$ draws & 2,000\\
+\bottomrule
+\end{tabular}
+\end{center}
+The Cartesian product of equations~\eqref{eq:gamma_grid} and
+\eqref{eq:rho_grid} gives eight independent primitive scenarios.  Each task
+solves the complete cost and policy grid so cost continuation remains internal
+to a process.  The local production command is
+\begin{verbatim}
+CF_FRESH=1 CF_WORKERS=4 ./counterfactual.sh
+\end{verbatim}
+This runs eight scenarios locally with at most four Julia processes.  Each
+Julia process itself uses one thread.
+
+\section{Files and Audit Checks}
+
+The live implementation contains the following files:
+\begin{itemize}[leftmargin=2em]
+\item \path{counterfactual_model.jl}: two-type primitives, exact allocation
+map, inverse FOCs, boundary solver, probability-parameterized system, and
+registered-pool calibration;
+\item \path{counterfactual_prep.jl}: representative-auction primitives,
+objective-capacity simulation, and the baseline marginal-participant bid
+anchor;
+\item \path{counterfactual_baseline.jl}: baseline registered-pool, $\overline
+K$, and $\kappa$ calibration;
+\item \path{counterfactual.jl}: one complete primitive-scenario task;
+\item \path{counterfactual_result.jl}: aggregation and policy comparisons;
+\item \path{counterfactual.sh}: local production entry point; and
+\item the three short shell wrappers used by that entry point.
+\end{itemize}
+
+\begin{sloppypar}
+Large task files remain under
+\path{Dropbox/renewable-auction/intermediate/counterfactual_task}.  Aggregated
+CSV files are written to
+\path{Dropbox/renewable-auction/intermediate/counterfactual_output}.  Logs are
+written to \path{Dropbox/renewable-auction/log/counterfactual}.  The script
+\path{code/result/counterfactual.jl} creates compact repository outputs.  The
+production result wrapper then runs \path{code/result/counterfactual.R} to
+create the paper tables, figures, and sentence files.
+\end{sloppypar}
+
+\section{Final Production Results}
+
+The primary share-choice results are:
+\begin{center}
+\begin{tabular}{lrrrrrr}
+\toprule
+$\Delta c$ & 0 & $-2$ & $-4$ & $-6$ & $-8$ & $-10$\\
+\midrule
+Entry & 0.668 & 0.668 & 0.668 & 0.668 & 0.668 & 0.668\\
+Winner mean $q$ & 1.000 & 0.993 & 0.868 & 0.677 & 0.547 & 0.482\\
+High-$\gamma$ winner share & 0.399 & 0.399 & 0.393 & 0.427 & 0.807 & 0.986\\
+Capacity without support (MW) & 0.0 & 0.0 & 0.0 & 19.4 & 532.3 & 2,082.5\\
+Total built capacity (MW) & 486.3 & 486.4 & 486.5 & 505.9 & 1,018.9 & 2,569.1\\
+\bottomrule
+\end{tabular}
+\end{center}
+The capacity-weighted winner share decreases monotonically in every primitive
+specification, and capacity built without auction support increases monotonically.  Entry is
+nearly constant.  Across the primary policy and cost grid it ranges from
+0.668 to 0.669, and the largest adjacent share-choice change across the full
+sensitivity grid is 0.019 percentage point.  Equilibrium bid adjustments keep
+the marginal auction value near the fixed qualification threshold, stabilizing
+the number of competitors.  Stable entry does not mechanically fix markups
+because the bid first-order condition changes with risk sharing; empirically,
+however, the capacity-weighted winner markup across bidder share choice and
+fixed shares $\lambda\in\{0,0.5,1\}$ ranges only from \$0.16/MWh to
+\$1.32/MWh.  The economic phase-out therefore operates through
+portfolio choice and wholesale construction rather than a collapse in auction
+participation.
+
+Selection responds both to policy and to the outside option.  At
+$\Delta c=-8$, high-$\gamma$ projects account for 71.9 percent of subsidy-auction
+winners and 85.9 percent of full-purchase-agreement winners, so leaving more
+wholesale risk with investors selects more strongly toward low-risk-premium
+projects.  Along the cost path, however, low-$\gamma$ projects become
+wholesale-viable first and increasingly build without auction support.  This correlated cost
+selection drives the high-$\gamma$ winner share up sharply in the deepest
+cost reductions even though the entrant pool remains approximately balanced.
+
+For a risk-neutral policymaker, the best fixed share is $\lambda=1$ at every
+cost shift.  For a policymaker with $\gamma_{PM}=E[\gamma]$, the best fixed
+share is $\lambda=0.5$.  In the matched-share comparison, the fixed-share
+auction generally has slightly lower policymaker certainty-equivalent cost
+and slightly more total construction.  This is not a dominance result because
+the fixed policy uses the average share revealed under endogenous portfolio
+choice and therefore does not preserve bidders' informational advantage.
+
+\section{Final Numerical Audit}
+
+The completed aggregation contains 4,048 rows: 2,024 distinct equilibria and
+two policymaker-risk evaluations for each.  There are no duplicate scenario
+keys and no missing core outcomes.  All 2,024 equilibria satisfy bid
+monotonicity, probability monotonicity, and $K>0$, and every allocation meets
+objective capacity.  The maximum pooled marginal-value residual is
+$1.15\times10^{-7}$ and the maximum probability-system residual is below
+$10^{-10}$.
+
+The common-support restriction is the material approximation.  In the
+primary specification, $R_{max}$ is at most 0.044.  It reaches 0.117 in the
+larger-dispersion, negatively correlated specification.  Fixed-share outcome
+paths remain smooth: across the full grid, the largest adjacent entry change
+over a 0.05 change in $\lambda$ is 0.071 percentage point, the largest adjacent
+winner-composition change is 6.4 percentage points, and the largest reversal
+is 0.24 percentage point.  Some boundary $K$ values move sharply despite these
+smooth observables, so economic outcomes are better conditioned than the
+individual boundary parameters.
+
+The primary baseline calibration gives $\bar b=56.76584$ and
+$\overline K=8.17775$, reproduces the observed participation rate 0.667692,
+and matches registered-pool moments with RMSE $8.94\times10^{-5}$.  The
+calibrated $\kappa$ is approximately $4.99\times10^{-19}$ per MWh.  This small
+value reflects the extremely low
+winning probability of the marginal entrant under the common-upper-support
+approximation and therefore depends on how the winning-probability function is
+extrapolated in the far tail.  Since counterfactual bidding depends on the
+winning-probability schedule and its slope through $K=-W/W'$, the magnitude of
+$\kappa$ should not be interpreted independently.  As long as the tail winning
+probability remains positive and large enough to affect the marginal bidder's
+bidding behavior, changing its precise extrapolation and the implied scale of
+$\kappa$ should not materially alter the economic results.
+
+\end{document}

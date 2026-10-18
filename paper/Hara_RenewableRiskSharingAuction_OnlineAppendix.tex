@@ -1,0 +1,898 @@
+\documentclass[12pt]{article}
+\usepackage[margin=1in]{geometry}
+
+%%% Packages %%%
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{bm}
+\usepackage{bbm}
+\usepackage{mathtools}
+\allowdisplaybreaks
+
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{pdflscape}
+\usepackage{setspace}
+\onehalfspacing
+
+% preambles for math writing
+\newtheorem{assumption}{Assumption}
+\newtheorem{lemma}{Lemma}
+\newtheorem{theorem}{Theorem}
+\newtheorem{corollary}{Corollary}
+\newtheorem{proposition}{Proposition}
+
+\theoremstyle{definition} % Upright text
+\newtheorem{definition}{Definition}
+\newtheorem{remark}{Remark}
+
+\DeclareMathOperator*{\plim}{plim}
+\DeclareMathOperator*{\var}{Var}
+\DeclareMathOperator*{\cov}{Cov}
+\DeclareMathOperator*{\corr}{corr}
+\DeclareMathOperator*{\rank}{rank}
+\DeclareMathOperator*{\tr}{tr}
+
+\newcommand{\indep}{\perp \!\!\! \perp}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\I}{\mathbbm{1}}
+\newcommand{\argmax}{\mathop{\rm arg~max}\limits}
+\newcommand{\argmin}{\mathop{\rm arg~min}\limits}
+
+% spacing around equations
+\newlength{\myeqskip}
+\setlength{\myeqskip}{9pt}
+\AtBeginDocument{
+	\setlength\abovedisplayskip{\myeqskip}
+	\setlength\belowdisplayskip{\myeqskip}
+	\setlength\abovedisplayshortskip{\myeqskip-\baselineskip}
+	\setlength\belowdisplayshortskip{\myeqskip}
+}
+
+% preambles for figures and tables
+\usepackage{tocloft}
+\usepackage{caption}
+\usepackage[labelformat=simple]{subcaption}
+\renewcommand\thesubfigure{(\alph{subfigure})}
+\usepackage{longtable}
+\usepackage{rotating}
+\usepackage{threeparttable}
+\usepackage{adjustbox}
+\DeclareTextFontCommand{\fignotefont}{\normalfont\footnotesize}
+\newcommand{\fignote}[2][\linewidth]{
+    \begin{minipage}[]{#1}
+        \vspace{12pt}
+        \fignotefont{#2}
+    \end{minipage}}
+\DeclareTextFontCommand{\tabnotefont}{\normalfont\footnotesize}
+\newcommand{\tabnote}[2][\linewidth]{
+    \begin{minipage}[]{#1}
+        \vspace{12pt}
+        \tabnotefont{#2}
+    \end{minipage}}
+\renewcommand\theContinuedFloat{\Alph{ContinuedFloat}}
+
+% path for input files (tables and single num tex files)
+\makeatletter
+\def\input@path{{../output/}}
+\makeatother
+
+% path for figures
+\graphicspath{{../output/figure/}}
+
+% preambles for references
+\usepackage{natbib}
+\usepackage{hyperref}
+\hypersetup{colorlinks,citecolor=blue,filecolor=red}
+\usepackage{cleveref}
+
+% preambles for cross-referencing
+\usepackage{xr-hyper}
+\externaldocument[paper-][nocite]{Hara_RenewableRiskSharingAuction}
+
+% move the title up a bit
+\title{\vspace{-0.5in}Online Appendix to ``Encouraging Renewable Investment: Risk Sharing Using Auctions''}
+\author{Konan Hara\footnote{Department of Economics, Michigan State University. Email: harakon1@msu.edu}}
+
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+%%% APPENDIX %%%
+\appendix
+\setcounter{page}{1}
+\renewcommand{\thepage}{A-\arabic{page}}
+\numberwithin{equation}{section}
+\renewcommand{\theequation}{\thesection\arabic{equation}}
+
+\section{Equilibrium Strategies}
+
+For notational simplicity, I suppress bidder subscripts $i$ on utility $u$ throughout this section. Utility is normalized by the outside payoff, $c$ denotes the effective cost, and payoffs are defined as in Section \ref{paper-sec:model}.
+
+\subsection{Sealed-Bid Auctions}
+\label{sec:eqsb}
+
+I derive sufficient conditions for the existence of a monotone pure-strategy BNE in the sealed-bid auctions of Section \ref{paper-sec:sb} using \citet{Reny2011} and evaluate them in empirically relevant settings. Bidder $i $'s bid price $b$ uniquely determines his optimal bid share given his risk aversion type $\gamma$ as in equation~\eqref{paper-eq:optqsb} in Section \ref{paper-sec:sb}:
+\begin{align*}
+q^\ast(b|\gamma) \coloneqq \min \left\{\max \left\{\underline{q}, 1 - \frac{\mu_r - \tilde{\delta} b}{\gamma \sigma_r^2} \right\}, 1 \right\}.
+\end{align*}
+Thus, the game satisfies conditions (i) and (ii) of Proposition 3.1 in \citet{Reny2011} because the support of the two-dimensional type space is compact and the bid price is effectively the only action bidders consider. 
+
+Bidder $i $'s expected utility of action $b $, given his risk aversion type $\gamma$ and cost type $c$, is $\mathrm{EU}_i(b|\gamma,c) \coloneqq W_i(b) \cdot u(\mathrm{CE}(q^\ast(b|\gamma),b|\gamma,c)|\gamma)$, where $\mathrm{CE} $ is a certainty equivalent function defined as
+\begin{align*}
+\mathrm{CE}(q,b|\gamma,c) \coloneqq q \tilde{\delta} b + (1 - q) \mu_r - c - RP_r(1-q|\gamma).
+\end{align*}
+By Corollary 4.2 of \citet{Reny2011}, a monotone pure-strategy BNE exists if this expected utility satisfies $\partial^2 \mathrm{EU}_i(b|\gamma,c)/\partial b \partial c \geq 0 $ and $\partial^2 \mathrm{EU}_i(b|\gamma,c)/\partial b \partial \gamma \geq 0 $ for all $b$, $\gamma $, and $c$ in the support for every monotone pure-strategy BNE of competitors. I show when these conditions hold below.
+
+Define $\mathrm{CE}_b \coloneqq \mathrm{CE}(q^\ast(b|\gamma),b|\gamma,c)$ for brevity. Note
+\begin{align*}
+\frac{\partial \mathrm{EU}_i(b|\gamma,c)}{\partial b} 
+= W_i'(b) \cdot u(\mathrm{CE}_b|\gamma) + W_i(b) \cdot u'(\mathrm{CE}_b|\gamma) \cdot q^\ast(b|\gamma) \tilde{\delta}.
+\end{align*}
+First,
+\begin{align*}
+\frac{\partial^2 \mathrm{EU}_i(b|\gamma,c)}{\partial b \partial c}
+= - W_i'(b)\cdot u'\!\left(\mathrm{CE}_b|\gamma\right) - W_i(b)\cdot u''\!\left(\mathrm{CE}_b|\gamma\right) \cdot q^\ast(b|\gamma)\tilde{\delta} \;>\; 0 .
+\end{align*}
+However, the sign of
+\begin{align*}
+\frac{\partial^2 \mathrm{EU}_i(b|\gamma,c)}{\partial b \partial \gamma}
+&= W_i'(b)\cdot \left\{-u'\!\left(\mathrm{CE}_b\,\middle|\,\gamma\right)
+      \cdot \frac{\partial RP_r(1-q^\ast(b|\gamma)\mid\gamma)}{\partial \gamma} + \frac{\partial u(\mathrm{CE}_b\mid\gamma)}{\partial \gamma} \right\} \\
+&\quad - W_i(b)\cdot u''\!\left(\mathrm{CE}_b\,\middle|\,\gamma\right)
+      \cdot \frac{\partial RP_r(1-q^\ast(b|\gamma)\mid\gamma)}{\partial \gamma}
+      \cdot q^\ast(b|\gamma)\tilde{\delta} \\
+&\quad + W_i(b)\cdot \left\{\frac{\partial u'(\mathrm{CE}_b\mid\gamma)}{\partial \gamma}
+      \cdot q^\ast(b|\gamma)\tilde{\delta} + u'\!\left(\mathrm{CE}_b\,\middle|\,\gamma\right)
+      \cdot \frac{\partial q^\ast(b|\gamma)}{\partial \gamma}\tilde{\delta} \right\}.
+\end{align*}
+is unclear since the term involving $\partial u'(\mathrm{CE}_b|\gamma)/\partial \gamma$ is negative and the other terms are nonnegative.
+
+To numerically evaluate the sign of $\partial^2 \mathrm{EU}_i(b|\gamma,c)/\partial b \partial \gamma$ in empirically relevant settings, I calculate it using the prespecified parameters, the parameter estimates, and the same simulated participant types used to recover the cost distributions in Online Appendix \ref{sec:gammacostsimulation}. This derivative is nonpositive for all simulated types in 10 auctions and for more than 99\% of the simulated types in 2 additional auctions, covering 12 out of \input{snt/auction_N_sb_nomissing} sealed-bid auctions used in the estimation. Reparameterizing risk aversion as $\tilde{\gamma} = -\gamma$ reverses the sign of this derivative, so the numerical exercise supports the existence of a monotone pure-strategy BNE in these auctions. The remaining 2 auctions are clear outliers: one is the first auction, which had a coarse discrete unit for bid quantities and hence a bid share upper bound well below 1 for some projects; the other had the lowest winning bid prices and relatively few winners.
+
+Additionally, if the bidders are \textit{ex-ante} symmetric, a symmetric monotone pure-strategy BNE exists under the same conditions by Theorem 4.5 of \citet{Reny2011}.
+
+\subsection{Descending-Clock Auctions}
+\label{sec:eqdc}
+
+I first derive the optimal bid share decision in descending-clock auctions in Section \ref{paper-sec:dc}. A bidder with risk aversion type $\gamma$ and cost type $c$ chooses his bid $(q,b) $ to maximize
+\begin{align*}
+(1-F_{p^\ast}(b)) \cdot E[u(q \tilde{\delta} p_b^\ast + (1 - q) r - c|\gamma)],
+\end{align*}
+where $p^\ast \sim \mathcal{N}(\mu_{p^\ast},\sigma_{p^\ast}^2)$, $p_b^\ast \sim \mathcal{TN}(\mu_{p^\ast},\sigma_{p^\ast}^2,b,\infty)$, and $r \sim \mathcal{N}(\mu_r,\sigma_r^2)$.
+$\mathcal{TN}(\mu_{p^\ast},\sigma_{p^\ast}^2,b,\infty) $ is a truncated normal that truncates $\mathcal{N}(\mu_{p^\ast},\sigma_{p^\ast}^2)$ from below at $b$. The bidder's certainty equivalent of NPV, $q \tilde{\delta} p_b^\ast + (1 - q) r - c$, is
+\begin{align*}
+\mathrm{CE}(q,b|\gamma,c) \coloneqq -\gamma^{-1} \mathcal{K}_{p_b^\ast}(-\gamma q \tilde{\delta}) -\gamma^{-1} \mathcal{K}_r(-\gamma(1-q)) - c,
+\end{align*}
+where $\mathcal{K}_Y(\tau) \coloneqq \log E[\exp(\tau Y)] $ is the cumulant generating function of a random variable $Y $. Note, for any $\tau $,
+\begin{align*}
+\mathcal{K}_{p_b^\ast}'(\tau) = \mu_{p^\ast} + \sigma_{p^\ast}^2 \tau + \sigma_{p^\ast} \Lambda \left(\frac{\mu_{p^\ast}-b}{\sigma_{p^\ast}} + \sigma_{p^\ast} \tau \right),
+\end{align*}
+where $\Lambda $ is the inverse Mills ratio for a standard normal. Then, the optimal bid share satisfies equation \eqref{paper-eq:focqdc} in Section \ref{paper-sec:dc} as
+\begin{align*}
+\frac{\partial \mathrm{CE}(q,b|\gamma,c)}{\partial q} = 0 \iff q = \left( \frac{1}{1 + \tilde{\delta}^2 \sigma_{p^\ast}^2/\sigma_r^2} \right) \left( 1 - \frac{\mu_r - \tilde{\delta} \tilde{\mu}_{p^\ast}(q,b|\gamma)}{\gamma \sigma_r^2} \right),
+\end{align*}
+where $\tilde{\mu}_{p^\ast}(q,b|\gamma) $ is the effective expected equilibrium clearing price for choosing bid $(q,b)$,
+\begin{align*}
+\tilde{\mu}_{p^\ast}(q,b|\gamma) = \mu_{p^\ast} + \sigma_{p^\ast} \Lambda \left(\frac{\mu_{p^\ast} - b}{\sigma_{p^\ast}} - q \gamma \tilde{\delta} \sigma_{p^\ast} \right).
+\end{align*}
+The unconstrained optimal bid share function $q^{\ast\ast}(b|\gamma) $ is defined as a solution of $q$ to equation \eqref{paper-eq:focqdc} for a given $b $.
+
+I next show $\partial q^{\ast\ast}(b|\gamma)/\partial b > 0 $. Differentiating both sides of equation \eqref{paper-eq:focqdc} with respect to $b $, I obtain
+\begin{align*}
+\frac{\partial q^{\ast\ast}(b|\gamma)}{\partial b} = - \frac{\tilde{\delta} \Lambda'\left(\frac{\mu_{p^\ast} - b}{\sigma_{p^\ast}} - q^{\ast\ast}(b|\gamma) \gamma \tilde{\delta} \sigma_{p^\ast} \right)}{\gamma \left\{ \sigma_r^2 + \left(1+\Lambda'\left(\frac{\mu_{p^\ast} - b}{\sigma_{p^\ast}} - q^{\ast\ast}(b|\gamma) \gamma \tilde{\delta} \sigma_{p^\ast} \right)\right) \tilde{\delta}^2 \sigma_{p^\ast}^2 \right\} } > 0
+\end{align*}
+since $\Lambda' \in (-1,0) $ for any argument. Thus, the equilibrium bid share continuously increases with the equilibrium bid price. However,
+\begin{align*}
+\frac{\partial q^{\ast\ast}(b|\gamma)}{\partial \gamma} = \frac{\mu_r - \tilde{\delta} \tilde{\mu}_{p^\ast}(q^{\ast\ast}(b|\gamma),b|\gamma) - q^{\ast\ast}(b|\gamma) \gamma \tilde{\delta}^2 \sigma_{p^\ast}^2 \Lambda'\left(\frac{\mu_{p^\ast} - b}{\sigma_{p^\ast}} - q^{\ast\ast}(b|\gamma) \gamma \tilde{\delta} \sigma_{p^\ast} \right)}{\gamma^2 \left\{ \sigma_r^2 + \left(1+\Lambda'\left(\frac{\mu_{p^\ast} - b}{\sigma_{p^\ast}} - q^{\ast\ast}(b|\gamma) \gamma \tilde{\delta} \sigma_{p^\ast} \right)\right) \tilde{\delta}^2 \sigma_{p^\ast}^2 \right\} }
+\end{align*}
+can be negative if $q^{\ast\ast} $ is close enough to 1. Intuitively, the risk from the clearing price uncertainty is more salient than the risk of the wholesale market when the bidder puts most of his electricity into the purchase agreement, which makes more risk-averse bidders move away from the purchase agreement.
+
+Lastly, I derive and evaluate sufficient conditions for the existence of a monotone pure-strategy BNE using \citet{Reny2011}, similarly to sealed-bid auctions in Online Appendix \ref{sec:eqsb}. The bid price is effectively the only action bidders consider because the bid price uniquely determines the optimal bid share through the optimal bid share function $q^\ast $. Thus, the game satisfies conditions (i) and (ii) of Proposition 3.1 in \citet{Reny2011}.
+
+The expected utility of action $b $ for a bidder with risk aversion type $\gamma$ and cost type $c$ is $\mathrm{EU}(b|\gamma,c) \coloneqq (1-F_{p^\ast}(b)) \cdot u(\mathrm{CE}(q^\ast(b|\gamma),b|\gamma,c)|\gamma) $. Define
+\begin{align*}
+\Delta_\Lambda(b|\gamma)
+\coloneqq \frac{1}{\sigma_{p^\ast}} \Biggl[
+\Lambda\!\left(\frac{\mu_{p^\ast}-b}{\sigma_{p^\ast}}\right)
+-\Lambda\!\left(\frac{\mu_{p^\ast}-b}{\sigma_{p^\ast}}
+- q^\ast(b|\gamma)\gamma \tilde{\delta}\sigma_{p^\ast}\right)
+\Biggr],
+\end{align*}
+and $\mathrm{CE}_b \coloneqq \mathrm{CE}(q^\ast(b|\gamma),b|\gamma,c)$ for brevity. $\Delta_\Lambda(b|\gamma) < 0$ since $\Lambda $ is a decreasing function. Note $\partial u(\mathrm{CE}_b|\gamma)/\partial b = -\gamma^{-1} u'(\mathrm{CE}_b|\gamma)\cdot \Delta_\Lambda(b|\gamma) $. First,
+\begin{align*}
+\frac{\partial^2 \mathrm{EU}(b|\gamma,c)}{\partial b \partial c}
+= f_{p^\ast}(b)\cdot u'(\mathrm{CE}_b|\gamma) + (1-F_{p^\ast}(b))\cdot \gamma^{-1}
+u''(\mathrm{CE}_b|\gamma)\cdot \Delta_\Lambda(b|\gamma)
+\;>\; 0.
+\end{align*}
+However, the sign of
+\begin{align*}
+&\frac{\partial^2 \mathrm{EU}(b|\gamma,c)}{\partial b \partial \gamma}
+= - f_{p^\ast}(b)\cdot
+\Biggl[
+u'(\mathrm{CE}_b|\gamma)\cdot \frac{\partial \mathrm{CE}_b}{\partial \gamma}
++ \frac{\partial u(\mathrm{CE}_b|\gamma)}{\partial \gamma}
+\Biggr] \\
+&+ (1-F_{p^\ast}(b))\cdot
+\Biggl[
+\Delta_\Lambda(b|\gamma)\cdot
+\Biggl\{
+\gamma^{-2}u'(\mathrm{CE}_b|\gamma)
+- \gamma^{-1}\Bigl(
+u''(\mathrm{CE}_b|\gamma)\cdot \frac{\partial \mathrm{CE}_b}{\partial \gamma}
++ \frac{\partial u'(\mathrm{CE}_b|\gamma)}{\partial \gamma}
+\Bigr)
+\Biggr\} \\
+&- \gamma^{-1}u'(\mathrm{CE}_b|\gamma)\cdot
+\frac{1}{\sigma_{p^\ast}}\,
+\Lambda'\!\left(
+\frac{\mu_{p^\ast}-b}{\sigma_{p^\ast}}
+- q^\ast(b|\gamma)\gamma \tilde{\delta}\sigma_{p^\ast}
+\right) \times \Bigl(\gamma\,\frac{\partial q^\ast(b|\gamma)}{\partial \gamma}
++ q^\ast(b|\gamma)\Bigr)\,\tilde{\delta}\sigma_{p^\ast}
+\Biggr]
+\end{align*}
+is unclear. The first term is positive, and the last term is also non-negative. For an interior bid share,
+\begin{align*}
+\frac{\partial q^{\ast\ast}(b|\gamma)}{\partial \gamma} \gamma + q^{\ast\ast}(b|\gamma) = \frac{\sigma_r^2}{\sigma_r^2 + \left(1+\Lambda'\left(\frac{\mu_{p^\ast} - b}{\sigma_{p^\ast}} - q^{\ast\ast}(b|\gamma) \gamma \tilde{\delta} \sigma_{p^\ast} \right)\right) \tilde{\delta}^2 \sigma_{p^\ast}^2 } > 0.
+\end{align*}
+At a locally binding bid share bound, $\partial q^\ast(b|\gamma)/\partial\gamma=0$, so $\gamma\,\partial q^\ast(b|\gamma)/\partial\gamma+q^\ast(b|\gamma)=q^\ast(b|\gamma)\geq0$.
+The terms in the curly bracket can be rewritten as
+\begin{align*}
+\gamma^{-2} \left(1 + \gamma \mathrm{CE}_b + \gamma^2 \cdot \frac{\partial \mathrm{CE}_b}{\partial \gamma} \right) \exp(-\gamma \mathrm{CE}_b),
+\end{align*}
+which will be positive unless the bidders are sufficiently risk averse to make $\gamma^2 \partial \mathrm{CE}/\partial \gamma $ negative enough.
+
+To numerically evaluate the sign of $\partial^2 \mathrm{EU}(b|\gamma,c)/\partial b \partial \gamma$ in empirically relevant settings, I calculate it using the prespecified parameters, the parameter estimates, and grid points in a broad range of individual types: $\gamma \in [0.05,1.00]$ and $c \in [10,50]$. For each type, I calculate the bidder's theoretical optimal bid price $b^\ast$ as the price at which the expected utility conditional on winning is zero, and exclude grid points whose implied winning probability $1-F_{p^\ast}(b^\ast)$ falls outside $[0.01,0.99]$. All evaluated grid points in each of the \input{snt/auction_N_dc} descending-clock auctions used in the analysis indicate $\partial^2 \mathrm{EU}(b|\gamma,c)/\partial b \partial \gamma \geq 0$. Therefore, this numerical exercise supports the conditions in Corollary 4.2 of \citet{Reny2011} and the existence of a monotone pure-strategy BNE in these auctions.
+
+Additionally, if the bidders are \textit{ex-ante} symmetric, a symmetric monotone pure-strategy BNE exists under the same conditions by Theorem 4.5 of \citet{Reny2011}.
+
+
+\section{Extensions and Robustness of the Bid-Share Model}
+
+For notational simplicity, I suppress bidder subscripts $i$ on utility $u$ throughout this section. Utility is normalized by the outside payoff, $c$ denotes the effective cost, and payoffs are defined as in Section \ref{paper-sec:model}. Online Appendix \ref{sec:shareprice} additionally allows a general separable risk premium function.
+
+\subsection{General Bid Share--Price Relationship}
+\label{sec:shareprice}
+
+Consider a bidder who has a strictly increasing concave utility function $u$, risk premium type $\gamma$, and cost type $c$ in a sealed-bid auction without bid share restrictions, i.e., $\underline{q} = 0$. I assume that the bidder's certainty equivalent from bid share $q$ can be written as
+\begin{align*}
+\mathrm{CE}(q,b^\ast\mid\gamma,c)
+\coloneqq q \tilde{\delta} b^\ast + (1-q)\mu_r - c - RP_r(1-q \mid \gamma),
+\end{align*}
+where $b^\ast$ is the bidder's equilibrium bid price, and $RP_r(1-q \mid \gamma)$ is the bidder's risk premium for selling share $1 - q \in [0,1]$ of the electricity to the wholesale market. Because utility is strictly increasing, maximizing expected utility is equivalent to maximizing this certainty equivalent. I assume the risk premium function $RP_r(\cdot \mid \gamma)$ is continuously differentiable, strictly increasing, and strictly convex on $[0,1]$. The risk premium is zero when the bidder is not exposed to the wholesale market risk, i.e., $RP_r(0 \mid \gamma) = 0 $. I also assume $RP_r'(0 \mid \gamma) = 0 $.
+
+$\gamma$ can be interpreted as a multidimensional type that summarizes all bidder-specific determinants of the risk premium function relevant for portfolio choice. The separable certainty equivalent representation is a restriction for general non-CARA preferences because risk premiums can depend on deterministic wealth. It holds under the CARA-normal structure in Section \ref{paper-sec:model}, where $\gamma$ coincides with the scalar risk aversion coefficient, and, more generally, whenever the risk premium can be summarized by wholesale market exposure and $\gamma$. Any bidder characteristic that affects the risk premium can be included in $\gamma$, and the joint distribution of $(\gamma,c)$ can allow arbitrary dependence between risk premium types and costs. This separability is useful for the identification and estimation of the $(\gamma,c)$ distribution as shown in Section \ref{paper-sec:econometric}.
+
+The optimal bid share $q^\ast$ satisfies $RP_r'(1-q^\ast \mid \gamma) = \mu_r - \tilde{\delta} b^\ast$ for $q^\ast \in (0,1) $, which indicates that $q^\ast$ balances the marginal risk premium and the marginal expected gain from the wholesale market relative to the purchase agreement. Since $RP_r'(\cdot \mid \gamma)$ is continuous and strictly increasing on $[0,1]$, $q^\ast$ can be written as
+\begin{align*}
+q^\ast(b^\ast \mid \gamma) = 
+\begin{cases}
+0 & \text{if } b^\ast \leq b_0 \coloneqq (\mu_r - RP_r'(1 \mid \gamma))/\tilde{\delta} \\
+1 - (RP_r'(\cdot \mid \gamma))^{-1}(\mu_r-\tilde{\delta} b^\ast) & \text{if } b^\ast \in (b_0, \mu_r/\tilde{\delta}) \\
+1 & \text{if } b^\ast \geq \mu_r/\tilde{\delta}
+\end{cases},
+\end{align*}
+and $q^\ast(b^\ast \mid \gamma)$ is continuous and strictly increasing in $b^\ast$ from $b^\ast = b_0$ to $\mu_r/\tilde{\delta}$. Thus, this general model maintains the monotone bid share-price relationship as illustrated in Figure \ref{paper-fig:portfolioaverse} in Section \ref{paper-sec:sb}.
+
+Suppose the equilibrium bid share-price relationship for risk premium type $\gamma$, $q^\ast(b^\ast \mid \gamma) $, is fully observed for a range of $b^\ast$ that covers $[b_0,\mu_r/\tilde{\delta}] $. Then, the undiscounted expected wholesale price $\mu_r/\tilde{\delta} $ is identified as the minimum $b^\ast$ that satisfies $q^\ast(b^\ast \mid \gamma) = 1 $ because\footnote{
+Note that the identification of $\mu_r $ does not depend on $\gamma$ since $RP_r'(0 \mid \gamma) = 0 $ for any $\gamma$ and $\mu_r$ does not depend on $\gamma$. Thus, even if the data involve unobserved heterogeneity in $\gamma$, $\mu_r$ can be identified as long as the bid share-price relationship is observed for a sufficiently wide range of bid prices to cover the full-allocation threshold.
+}
+\begin{align*}
+1 = 1 - (RP_r'(\cdot \mid \gamma))^{-1}(\mu_r-\tilde{\delta} b^\ast) \iff b^\ast = \mu_r/\tilde{\delta}.
+\end{align*}
+Since $q^\ast(b^\ast \mid \gamma)$ is continuous and strictly increasing in $b^\ast \in [b_0,\mu_r/\tilde{\delta}] $, I can invert it to obtain $b^\ast(q^\ast \mid \gamma) $ for all $q^\ast \in [0,1] $. Given the initial condition of $RP_r(0 \mid \gamma) = 0 $, I integrate the marginal risk premium, $RP_r'(1-q^\ast \mid \gamma) = \mu_r-\tilde{\delta} b^\ast(q^\ast \mid \gamma)$, from $q^\ast = 1 $ to $0$ to recover the risk premium function $RP_r(1-q^\ast \mid \gamma) $ for all $q^\ast \in [0,1] $. If the minimum possible bid share is non-zero (i.e., $\underline{q} > 0 $), identifying the entire risk premium function (i.e., $RP_r(1-q^\ast \mid \gamma) $ for all $q^\ast \in [0,1] $) requires some functional form restrictions to extend the risk premium function to the region outside the possible bid share, $q^\ast \in [0,\underline{q}) $.
+
+The sealed-bid case provides the cleanest illustration of how the bid share-price relationship identifies the risk premium function. In descending-clock auctions, bidders do not know the purchase agreement price when choosing their shares, so both purchase agreement and wholesale prices are uncertain. Consequently, the certainty equivalent portfolio condition depends on the conditional clearing price distribution induced by the bid price as well as the wholesale price distribution, and the bid share-price relationship requires the full utility specification used in Section \ref{paper-sec:dc}.
+
+
+\subsection{Partial Awards to the Marginal Winner}
+\label{sec:winner_partial}
+
+This section derives the optimal bid share decision under a partial-award rule in which the marginal winner, defined as the winner with the highest bid price among the winners, receives only the residual procurement quantity. Under this rule, the bid share does not affect the event that a bidder receives a positive allocation. Instead, it affects the expected utility of bidding through the portfolio payoff in states where the bidder receives the requested share. In sealed-bid auctions, the partial-award rule leaves the optimal bid share condition unchanged because the purchase agreement price is fixed at the bid price, regardless of whether the allocation is full or partial. In descending-clock auctions, which have been subject to the partial-award rule since 2018, the rule changes the optimal bid share condition by reweighting the clearing price distribution toward states in which the bidder receives the full requested share; because this full-allocation event depends on the bid share, the resulting bid share condition is more complicated than under the baseline full-award rule. The important point is that this complication operates through the payoff-relevant portfolio condition, not through the probability of receiving a positive allocation.
+
+The role of bid share decisions would differ under a rule that rejects the project whose requested quantity causes procurement to exceed the target, because bidders would then have an incentive to reduce their bid shares to fit within the remaining procurement capacity. I do not consider that rule here.
+
+I assume that the marginal winner who would be subject to the partial award is the winner with the highest bid price among the winners in both the hypothetical sealed-bid partial-award case corresponding to Section \ref{paper-sec:sb} and descending-clock auctions under the continuous-clock approximation in Section \ref{paper-sec:dc}. I do not consider ties for the marginal winner position, which is a measure-zero event under the continuous bid price distribution. For any awarded share $q$, Section \ref{paper-sec:model} shows that bidder $i$'s certainty equivalent conditional on winning with purchase agreement price $p$ is
+\begin{align*}
+\mathrm{CE}_i(q,p) \coloneqq q \tilde{\delta} p + (1 - q) \mu_r - c_i - RP_r(1-q \mid \gamma_i).
+\end{align*}
+Under the partial award rule, bidder $i$'s awarded share with bid $(q,b)$ becomes
+\begin{align*}
+\min \{ q, RD_i(b)/Capacity_i \} \text{ if } 0 < RD_i(b),
+\end{align*}
+where $RD_i(b) \coloneqq D - \sum_{j \neq i} \{ q_j Capacity_j \cdot \I(b_j \leq b) \}$ is the realized residual procurement capacity at $b$. I derive the optimal bid share condition for sealed-bid and descending-clock auctions under this partial-award rule below.
+
+\textbf{Sealed-Bid Auctions.}
+Let $f_{RD \mid b}$ denote the distribution of $RD_i(b)$. Bidder $i$'s expected utility of bidding $(q,b) $ becomes
+\begin{align*}
+\mathrm{EU}_i(q, b) &= \int_{q Capacity_i}^{\infty} u(\mathrm{CE}_i(q, b)) f_{RD \mid b}(x \mid b) \, dx \\
+&\quad + \int_{0}^{q Capacity_i} u(\mathrm{CE}_i(x/Capacity_i, b)) f_{RD \mid b}(x \mid b) \, dx.
+\end{align*}
+Differentiating with respect to $q$ and applying Leibniz's rule, the boundary terms cancel as the bidder's payoff is continuous at $x=q Capacity_i$, and I obtain
+\begin{align*}
+\frac{\partial \mathrm{EU}_i(q, b)}{\partial q} &= \int_{q Capacity_i}^{\infty} u'(\mathrm{CE}_i(q, b)) \frac{\partial \mathrm{CE}_i(q, b)}{\partial q} \cdot f_{RD \mid b}(x \mid b) \, dx\\
+&= \Pr(RD_i(b) \geq q Capacity_i \mid b) \cdot u'(\mathrm{CE}_i(q, b)) \frac{\partial \mathrm{CE}_i(q, b)}{\partial q}.
+\end{align*}
+I assume that the full allocation probability is strictly positive for all possible bid prices, i.e., $\Pr(RD_i(b) \geq q Capacity_i \mid b) > 0$ for all $b$, which is an assumption analogous to the strictly positive winning probability in Section \ref{paper-sec:sb}. Then, the optimal bid share condition, $\partial \mathrm{EU}_i(q, b)/\partial q = 0$, is equivalent to $\partial \mathrm{CE}_i(q, b)/\partial q = 0$, which reduces to exactly the same optimal portfolio choice as in Section \ref{paper-sec:sb}.
+
+\textbf{Descending-Clock Auctions.}
+Let $f_{RD,p \mid b}$ denote the joint distribution of $RD_i(b)$ and clearing price $p$ conditional on bidder $i$'s bid price $b$. Bidder $i$'s expected utility is
+\begin{align*}
+\mathrm{EU}_i(q,b)
+&= \int_{b}^{\infty}
+\int_{q Capacity_i}^{\infty}
+u(\mathrm{CE}_i(q,p)) f_{RD,p \mid b}(x,p \mid b)\, dx\, dp \\
+&\quad + \int_{b}^{\infty}
+\int_{0}^{q Capacity_i}
+u(\mathrm{CE}_i(x/Capacity_i,p)) f_{RD,p \mid b}(x,p \mid b)\, dx\, dp .
+\end{align*}
+Differentiating with respect to $q$ and applying Leibniz's rule, the boundary terms cancel as in sealed-bid auctions, and I obtain
+\begin{align*}
+\frac{\partial \mathrm{EU}_i(q,b)}{\partial q}
+&= \int_{b}^{\infty}
+\int_{q Capacity_i}^{\infty}
+u'(\mathrm{CE}_i(q,p))
+\frac{\partial \mathrm{CE}_i(q,p)}{\partial q}
+f_{RD,p \mid b}(x,p \mid b)\, dx\, dp \\
+&= \Pr(RD_i(b)\geq q Capacity_i \mid b)
+\int_{b}^{\infty}
+u'(\mathrm{CE}_i(q,p))
+\frac{\partial \mathrm{CE}_i(q,p)}{\partial q}
+f_{p \mid b}^{\mathrm{FA}(q,b)}(p \mid b)\, dp,
+\end{align*}
+where $f_{p \mid b}^{\mathrm{FA}(q,b)}$ is the clearing price distribution conditional on bid price $b$ and full allocation at share $q$ defined as
+\begin{align*}
+f_{p \mid b}^{\mathrm{FA}(q,b)}(p \mid b)
+\coloneqq
+\frac{\int_{q Capacity_i}^{\infty} f_{RD,p \mid b}(x,p \mid b)\, dx}
+{\Pr(RD_i(b)\geq q Capacity_i \mid b)}.
+\end{align*}
+The partial-award region, $0<RD_i(b)<q Capacity_i$, does not contribute directly to the optimal bid share condition because the awarded share is determined by the realized residual procurement capacity, $RD_i(b)$, not by the bidder's requested share $q$.
+
+I assume that the full allocation probability is strictly positive as in sealed-bid auctions, and then, the optimal bid share condition is equivalent to the weighted portfolio condition
+\begin{align*}
+\int_{b}^{\infty}
+u'(\mathrm{CE}_i(q,p))
+\frac{\partial \mathrm{CE}_i(q,p)}{\partial q}
+f_{p \mid b}^{\mathrm{FA}(q,b)}(p \mid b)\, dp = 0.
+\end{align*}
+This condition is not the same as the full-award optimal bid share condition in Section \ref{paper-sec:dc}, because $f_{p \mid b}^{\mathrm{FA}(q,b)}$ reweights the clearing price distribution toward states in which bidder $i$ receives the full requested share $q$. However, bidders still choose bid shares $q$ through a portfolio choice conditional on the payoff-relevant winning states, rather than through the probability of receiving a positive allocation.
+
+
+\section{Estimation Procedures}
+\label{sec:estimationprocedure}
+
+\setcounter{table}{0}
+\setcounter{figure}{0}
+\renewcommand{\thetable}{\Alph{section}\arabic{table}}
+\renewcommand{\thefigure}{\Alph{section}\arabic{figure}}
+
+\subsection{Wholesale Market Price Variance}
+\label{sec:spotvar}
+
+\begin{figure}[htb!]
+\caption{Electricity spot prices in Brazil and the U.S. from 2001 to 2022}
+\label{fig:spotprice}
+\begin{subfigure}{0.49\textwidth}
+\caption{Annual average}
+\includegraphics[width=\textwidth]{spotprice_annual.png}
+\end{subfigure}
+\hfill
+\begin{subfigure}{0.49\textwidth}
+\caption{Monthly average}
+\includegraphics[width=\textwidth]{spotprice_monthly.png}
+\end{subfigure}
+\fignote{Notes: Brazil's spot prices are provided by the Chamber of Electric Energy Commercialization \citep{CCEE2023}. Brazilian prices are adjusted for inflation using 2022 as the base year and converted to U.S.\ dollars assuming a 5-to-1 Brazilian Real to U.S.\ Dollar exchange rate. The U.S. spot prices average the five hubs (Mass Hub, PJM West, Mid-C, Palo Verde, and SP-15) for which historical data are available from January 2001 in the Intercontinental Exchange \citep{EIA2024}. The U.S. prices are adjusted for inflation using the Consumer Price Index, with 2022 as the base year \citep{BLS2023}.}
+\end{figure}
+
+I use Brazil's annual spot prices to estimate a mean reverting process and calculate the variance of discounted wholesale market revenue over the purchase agreement's 20-year horizon. Consider an auction at year $t=0$ with a lead time $l \geq 1$. Conditioning on information available at the auction date, including the current wholesale price $r_0$, I calculate the wholesale market variance defined in Section \ref{paper-sec:model} as $\sigma_r^2 = \var\left(T^{-1}\sum_{t=l}^{l+T-1}\delta^t r_t\,\middle|\,r_0\right)$. I consider integer-valued lead time and a mean reverting process for discrete time $t=0,1,\dots $. I linearly interpolate $\sigma^2_r$ for lead times that are not integer-valued.
+
+I specify a mean reverting process (or an AR(1) model with an intercept) of wholesale market prices as $r_t = A + \rho r_{t-1} + \xi_t, \xi_t \sim \mathcal{N}(0,\sigma_{\xi}^2)$, where $A $ is an intercept, $\rho $ is an autocorrelation coefficient, and $\xi_t $ is a residual independent across $t$. I use annual spot market prices to estimate the parameters $(A,\rho,\sigma_{\xi}^2) $ by maximum likelihood estimation. As the mean reverting process implies $r_t = A \sum_{h=0}^{t-1} \rho^h + \rho^t r_0 + \sum_{h=0}^{t-1} \rho^h \xi_{t-h}$, the wholesale market variance $\sigma^2_r$ can be calculated as
+\begin{eqnarray*}
+\sigma^2_r = \frac{\sigma_{\xi}^2}{T^2} \left[\sum_{t=1}^l \left(\frac{\delta^l \rho^{l-t} (1-\delta^T \rho^T)}{1-\delta \rho} \right)^2 + \sum_{t=l+1}^{l+T-1} \left(\frac{\delta^t (1-\delta^{l+T-t} \rho^{l+T-t})}{1-\delta \rho} \right)^2 \right].
+\end{eqnarray*}
+
+% % derivation of above equation
+% The mean reverting process can be analyzed as follows
+% \begin{eqnarray*}
+% r_t &=& A + \rho r_{t-1} + \xi_t \\
+% &=& A + \rho (A + \rho r_{t-2} + \xi_{t-1} ) + \xi_t \\
+% &=& A(1+\rho) + \rho^2 r_{t-2} + (\xi_t+\rho \xi_{t-1}) \\
+% &=& \vdots \\
+% &=& A \sum_{h=0}^{t-1} \rho^h + \rho^t r_0 + \sum_{h=0}^{t-1} \rho^h \xi_{t-h}.
+% \end{eqnarray*}
+% Then, observe
+% \begin{eqnarray*}
+% \var \left( \sum_{t=l}^{l+T-1} \delta^t r_t \right) &=& \var \left( \sum_{t=l}^{l+T-1} \delta^t \left(A \sum_{h=0}^{t-1} \rho^h + \rho^t r_0 + \sum_{h=0}^{t-1} \rho^h \xi_{t-h} \right) \right) \\
+% &=& \var \left( \sum_{t=l}^{l+T-1} \delta^t \sum_{h=0}^{t-1} \rho^h \xi_{t-h} \right)
+% \end{eqnarray*}
+% and
+% \begin{eqnarray*}
+% &\phantom{=}& \sum_{t=l}^{l+T-1} \delta^t \sum_{h=0}^{t-1} \rho^h \xi_{t-h} \\
+% &=& (\delta^l \rho^{l-1} + \cdots + \delta^{l+T-1} \rho^{l+T-2}) \xi_1 + \cdots + (\delta^l \rho^0 + \cdots + \delta^{l+T-1} \rho^{T-1}) \xi_l \\
+% &\phantom{=}& + (\delta^{l+1} \rho^0 + \cdots + \delta^{l+T-1} \rho^{T-2}) \xi_{l+1} + \cdots + (\delta^{l+T-2} \rho^0 + \delta^{l+T-1} \rho^1) \xi_{l+T-2} + \delta^{l+T-1} \rho^0 \xi_{l+T-1} \\
+% &=& \sum_{t=1}^l \frac{\delta^l \rho^{l-t} (1-\delta^T \rho^T)}{1-\delta \rho} \cdot \xi_t + \sum_{t=l+1}^{l+T-1} \frac{\delta^t (1-\delta^{l+T-t} \rho^{l+T-t})}{1-\delta \rho} \cdot \xi_t.
+% \end{eqnarray*}
+% Thus,
+% \begin{eqnarray*}
+% \sigma^2_r &=& \var \left( \frac{1}{T} \sum_{t=l}^{l+T-1} \delta^t r_t \right) \\
+% &=& \frac{1}{T^2} \var \left( \sum_{t=l}^{l+T-1} \delta^t r_t \right) \\
+% &=& \frac{1}{T^2} \left[\sum_{t=1}^l \left(\frac{\delta^l \rho^{l-t} (1-\delta^T \rho^T)}{1-\delta \rho} \right)^2 \var(\xi_t) + \sum_{t=l+1}^{l+T-1} \left(\frac{\delta^t (1-\delta^{l+T-t} \rho^{l+T-t})}{1-\delta \rho} \right)^2 \var(\xi_t) \right] \\
+% &=& \frac{\sigma_{\xi}^2}{T^2} \left[\sum_{t=1}^l \left(\frac{\delta^l \rho^{l-t} (1-\delta^T \rho^T)}{1-\delta \rho} \right)^2 + \sum_{t=l+1}^{l+T-1} \left(\frac{\delta^t (1-\delta^{l+T-t} \rho^{l+T-t})}{1-\delta \rho} \right)^2 \right].
+% \end{eqnarray*}
+
+
+\subsection{Descending-Clock Auction Price Distribution}
+\label{sec:dcprice}
+
+I detail the calculation of the descending-clock auction's equilibrium clearing price distribution and the recovery of the auction's equilibrium bid price distribution from it. I specify the conditional distribution of the equilibrium clearing price $p^\ast$ given procurement capacity $D$ as
+\begin{align*}
+f_{p^\ast | D} = \mathcal{N}(\beta_{pD 0} + \beta_{pD 1} \log D + \beta_{pD 2} (\tau+l) + \beta_{pD 3} m + \beta_{pD 4} N,\sigma_{pD}^2),
+\end{align*}
+where $\tau$ is the auction date, $l $ is the lead time, $m$ is the forecasted marginal cost of electricity at the auction date, and $N$ is the number of participants. I expect a low clearing price with a low procurement capacity $D$ and a large number of participants $N $ because a low bid price is likely to clear the auction. The sum of the auction date and the lead time, $\tau+l$, is the scheduled operation start date, intended to capture the trend in bidders' costs parsimoniously. Forecasted marginal cost of electricity $m $ proxies the expected wholesale price, which affects the bidding decision. I use the parameters $(\beta_{pD 0},\beta_{pD 1},\beta_{pD 2},\beta_{pD 3},\beta_{pD 4},\sigma_{pD}^2) $ that maximize the likelihood.
+
+I specify the log procurement capacity ($\log D$) distribution similarly,
+\begin{align}
+\label{eq:proccapacity}
+f_{\log D} = \mathcal{N}(\beta_{D 0} + \beta_{D 1} (\tau+l) + \beta_{D 2} m + \beta_{D 3} N,\sigma_D^2),
+\end{align}
+and use the parameters $(\beta_{D 0},\beta_{D 1},\beta_{D 2},\beta_{D 3},\sigma_D^2) $ that maximize the likelihood. Integrating out the procurement capacity from the conditional equilibrium clearing price distribution yields the (marginal) equilibrium clearing price distribution: $f_{p^\ast} = \mathcal{N}(\mu_{p^\ast},\sigma_{p^\ast}^2) $, where
+\begin{align*}
+\begin{cases}
+\mu_{p^\ast} = \beta_{pD 0} + \beta_{pD 1} \mu_{\log D} + \beta_{pD 2} (\tau+l) + \beta_{pD 3} m + \beta_{pD 4} N\\
+\sigma_{p^\ast}^2 = \sigma_{pD}^2 + \beta_{pD 1}^2 \sigma_D^2
+\end{cases},
+\end{align*}
+and $\mu_{\log D} = \beta_{D 0} + \beta_{D 1} (\tau+l) + \beta_{D 2} m + \beta_{D 3} N $.
+
+I then recover the auction's equilibrium bid price distribution. Let $F_X$ be the cumulative distribution function (CDF) of a random variable $X$. Conditional on the realized number of winners $M$, the clearing price is the $(M+1)$th order statistic of the $N$ bids, $p^\ast=b^\ast_{M+1:N}$. Formally, recovering the bid distribution therefore requires $f_{p^\ast|M}$, whereas the fitted clearing price model provides $f_{p^\ast|D}$. These conditional distributions are not identical because $M$ is determined jointly by $D$ and the realized bid prices, shares, and capacities. I use $f_{p^\ast|D}$ as a continuous approximation to $f_{p^\ast|M}$. This approximation is reasonable in my setting because the realized number of winners is large, typically exceeding 20, so procurement capacity provides a relatively fine proxy for the order statistic rank that clears the auction. Assuming i.i.d.\ bids, I can then recover the distribution of the equilibrium bid price $b^\ast$ using the one-to-one correspondence between the order statistics distribution and the original distribution:
+\begin{align*}
+F_{p^\ast|D}(b) \approx F_{p^\ast|M}(b) = F_{b^\ast_{M+1:N}}(b) = \sum_{j=M+1}^N \binom{N}{j} F_{b^\ast}(b)^j (1-F_{b^\ast}(b))^{N-j}.
+\end{align*}
+
+The bid price distribution I need in the estimation is the distribution truncated from above at the observed final bid price $b_i^d$, i.e., $f_{b^\ast \mid (b^\ast \leq b_i^d)}$. Since $b_i^d$ is no larger than the realized clearing price $p$, I only need to solve for $F_{b^\ast}(b)$ up to $b = p$. I employ a root-finding algorithm over a grid of $b$ with \$0.01/MWh increments from \$0/MWh to $p$ to solve for $F_{b^\ast}(b)$ at each grid point. I calculate the truncated distribution for each winner $i$ as $F_{b^\ast \mid (b^\ast \leq b_i^d)}(b) = F_{b^\ast}(b)/F_{b^\ast}(b_i^d)$ for $b \leq b_i^d$. I linearly interpolate the inverse CDF $F_{b^\ast \mid (b^\ast \leq b_i^d)}^{-1}$ to draw simulated bid prices for the numerical integration in the generalized method of moments estimation in Section \ref{sec:gmm}.
+
+
+\subsection{Generalized Method of Moments}
+\label{sec:gmm}
+
+I detail the first-step estimation procedure to recover the parameters governing bidders' risk aversion $\gamma_i$, the expected wholesale price $\mu_r$, and the variance of the bid share shock $\sigma_\eta^2$. I parameterize these objects as
+\begin{align*}
+\gamma_i = \exp\left\{\alpha_{\gamma 0}+\alpha_{\gamma 1}\log(1+K_i)\right\},
+\mu_r = \delta^l(\alpha_{r 0}+\alpha_{r 1}m), \text{ and }
+\sigma_\eta = \exp(\alpha_\eta),
+\end{align*}
+where $K_i$ is the prior started wind capacity of project $i$'s affiliated firm, $l$ is the lead time, and $m$ is forecasted marginal cost of electricity at the time of auction. Let $\theta_q=(\alpha_{\gamma 0},\alpha_{\gamma 1},\alpha_{r 0},\alpha_{r 1})$ be the parameters governing the model-implied optimal portfolio choice and $\theta=(\theta_q,\alpha_\eta)$ be the full first-step parameter vector. I estimate $\theta$ by two-step generalized method of moments (GMM) using the moment conditions derived from the censored normal model of observed bid shares.
+
+Assumption \ref{paper-assu:obsq} implies that the observed bid share $q_i^d$ is generated by a two-sided censored normal model centered at the model-implied unconstrained optimal bid share $q_i^{\ast\ast}(b_i^\ast;\theta_q)$, with equilibrium bid price $b_i^\ast$ and project-specific support $[\underline{q}_i,\bar{q}_i]$. For sealed-bid auctions, $q_i^{\ast\ast}(b_i^\ast;\theta_q)$ is given by equation~\eqref{paper-eq:optqsb} in Section \ref{paper-sec:sb}. For descending-clock auctions, it is the solution to equation~\eqref{paper-eq:focqdc} in Section \ref{paper-sec:dc}. I match three features of the observed bid share distribution to their model counterparts: the probabilities of being at the lower and upper bounds, $p_{L,i}^\theta(b_i^\ast)$ and $p_{U,i}^\theta(b_i^\ast)$, and the conditional mean among interior bid shares, $\mu_{I,i}^\theta(b_i^\ast)$. The bound probabilities are $p_{L,i}^\theta(b_i^\ast)=\Phi(z_{L,i}^\theta(b_i^\ast))$ and $p_{U,i}^\theta(b_i^\ast)=1-\Phi(z_{U,i}^\theta(b_i^\ast))$, where $\Phi$ is the standard normal cumulative distribution function (CDF) and
+\begin{align*}
+z_{L,i}^\theta(b_i^\ast) = \frac{\underline{q}_i - q_i^{\ast\ast}(b_i^\ast; \theta_q)}{\sigma_\eta}
+\quad \text{and} \quad
+z_{U,i}^\theta(b_i^\ast) = \frac{\bar{q}_i - q_i^{\ast\ast}(b_i^\ast; \theta_q)}{\sigma_\eta}.
+\end{align*}
+Conditional on an interior bid share realization, the truncated mean is
+\begin{align*}
+\mu_{I,i}^\theta(b_i^\ast) = q_i^{\ast\ast}(b_i^\ast;\theta_q) + \sigma_\eta \frac{\phi(z_{L,i}^\theta(b_i^\ast))-\phi(z_{U,i}^\theta(b_i^\ast))}{p_{I,i}^\theta(b_i^\ast)},
+\end{align*}
+where $\phi$ is the standard normal density and $p_{I,i}^\theta(b_i^\ast) = \Phi(z_{U,i}^\theta(b_i^\ast)) - \Phi(z_{L,i}^\theta(b_i^\ast))$ is the probability of an interior bid share.
+
+The three moments, $p_{L,i}^\theta(b_i^\ast)$, $p_{U,i}^\theta(b_i^\ast)$, and $\mu_{I,i}^\theta(b_i^\ast)$, are interacted with a set of instrumental variables (IVs) to identify the parameters $\theta$. The IVs include auction format-specific constants and observed prices $b_i^d$ (defined as the bid price in sealed-bid auctions and the final submitted price in descending-clock auctions), the forecasted marginal cost $m$ pooled across auction formats, and the interaction between the observed prices and $\log(1+K_i)$ pooled across auction formats. Intuitively, the auction format-specific constants and \(b_i^d\) capture the bid share--price relationship separately by auction format and pin down the locations (or averages) of the risk aversion \(\gamma_i\) and the expected wholesale price \(\mu_r\). $m$ allows the auction-level heterogeneity in $\mu_r$, and $m$ pooled across auction formats effectively extrapolates $\mu_r$ identified from sealed-bid auctions to descending-clock auctions, following the identification strategy discussed in Section \ref{paper-sec:identification}. The interaction between $b_i^d$ and $\log(1+K_i)$ captures the heterogeneity in the bid share--price relationship across projects affiliated with firms that have different prior wind portfolios, which informs about the heterogeneity in risk aversion through $K_i$.
+
+In sealed-bid auctions, the equilibrium bid price $b_i^\ast$ is observed as $b_i^d$, so I evaluate the censored normal moments at $b_i^\ast=b_i^d$, and the individual moment vector is
+\begin{align*}
+\begin{pmatrix}
+\mathbf{Z}_i \left[\I(q_i^d=\underline{q}_i)-p_{L,i}^\theta(b_i^d)\right] \\
+\mathbf{Z}_i \left[\I(q_i^d=\bar{q}_i)-p_{U,i}^\theta(b_i^d)\right] \\
+\mathbf{Z}_i \I(\underline{q}_i<q_i^d<\bar{q}_i)\left[q_i^d-\mu_{I,i}^\theta(b_i^d)\right]
+\end{pmatrix},
+\end{align*}
+where $\mathbf{Z}_i$ is a vector of IVs and $\I$ is the indicator function.
+
+In descending-clock auctions, the winner's equilibrium bid price is not observed. I only observe a final submitted price and recover the winner-specific latent equilibrium bid price distribution truncated from above at that observed price, $F_{b^\ast \mid (b^\ast \leq b_i^d)}$, as described in Online Appendix \ref{sec:dcprice}. I integrate over this latent bid price numerically using Gauss--Legendre quadrature. Let $\{b_s(b_i^d),w_s\}_{s=1}^S$ denote the quadrature nodes and weights, where $b_s(b_i^d)$ is obtained by evaluating the inverse truncated CDF, $F_{b^\ast \mid (b^\ast \leq b_i^d)}^{-1}$, at node $s$. The quadrature rule approximates the two bound probability moments, $p_{L,i}^\theta$ and $p_{U,i}^\theta$, as weighted averages of the moments evaluated at the quadrature nodes:
+\begin{align*}
+\tilde{p}_{L,i}^\theta(b_i^d) &= E[\I(q_i^d=\underline{q}_i)\mid b_i^d] = E[p_{L,i}^\theta(b^\ast)\mid b^\ast \leq b_i^d] \approx \sum_{s=1}^S w_s p_{L,i}^\theta(b_s(b_i^d)) \text{ and }\\
+\tilde{p}_{U,i}^\theta(b_i^d) &= E[\I(q_i^d=\bar{q}_i)\mid b_i^d] = E[p_{U,i}^\theta(b^\ast)\mid b^\ast \leq b_i^d] \approx \sum_{s=1}^S w_s p_{U,i}^\theta(b_s(b_i^d)).
+\end{align*}
+
+Next, the interior-share moment, $\mu_{I,i}^\theta$, can be calculated as
+\begin{align*}
+\tilde{\mu}_{I,i}^\theta(b_i^d) &= E[q_i^d\mid I_i,b_i^d] = \frac{E[\I(I_i) q_i^d\mid b_i^d]}{E[\I(I_i) \mid b_i^d]} = \frac{E[p_{I,i}^\theta(b^\ast) \mu_{I,i}^\theta(b^\ast)\mid b^\ast \leq b_i^d]}{E[p_{I,i}^\theta(b^\ast) \mid b^\ast \leq b_i^d]} \\
+&\approx \frac{\sum_{s=1}^S w_s p_{I,i}^\theta(b_s(b_i^d)) \mu_{I,i}^\theta(b_s(b_i^d))}{\sum_{s=1}^S w_s p_{I,i}^\theta(b_s(b_i^d))},
+\end{align*}
+where $I_i=\{\underline{q}_i<q_i^d<\bar{q}_i\}$ is the event that the observed bid share is interior.
+The individual moment vector is constructed in the same way as in sealed-bid auctions, replacing $p_{L,i}^\theta$, $p_{U,i}^\theta$, and $\mu_{I,i}^\theta$ with $\tilde{p}_{L,i}^\theta$, $\tilde{p}_{U,i}^\theta$, and $\tilde{\mu}_{I,i}^\theta$, respectively. I use $S=10$ nodes in the implementation.
+
+In practice, I begin the optimization with a restricted model that has homogeneous risk aversion and a homogeneous expected wholesale price, using an identity initial weighting matrix. I then allow the expected wholesale price to vary with $m$ and finally allow risk aversion to vary with $K_i$, initializing each expanded model at the preceding model's estimates and constructing its initial weighting matrix at those estimates. Within each model, the second GMM step starts from the first-step estimate and uses the moment covariance matrix evaluated there.
+
+For inference, I resample firms globally with replacement, preserving dependence among projects affiliated with the same firm across auctions and auction formats. I recenter the bootstrap moments at the original-sample estimates and hold each model's original-sample second-step weighting matrix fixed across bootstrap draws.
+
+
+\subsection{Sealed-Bid Auction Winning Probability Function}
+\label{sec:winprob}
+
+I detail the calculation of the sealed-bid auction's equilibrium winning probability function. I use the observed bid price $b_i^d $ in place of the equilibrium bid price $b_i^\ast$ for each bidder $i $ in the estimation below. First, I estimate the log capacity ($\log C$) distribution, conditional on $b^\ast$, specified as $f_{\log C | b^\ast} = \mathcal{N}(\beta_C b^\ast + \delta^C_a,\sigma_C^2)$, where $\delta^C_a $ is an auction fixed effect, by maximum likelihood estimation (MLE). Second, I estimate the conditional distribution of prior started wind capacity $f_{K|C,b^\ast}$ by MLE using the following censored normal model for the transformed capacity:
+\begin{align*}
+\log(1+K_i)
+= \max\left\{0,\beta_{K 1}\log(Capacity_i)+\beta_{K 2}b_i^\ast
++\delta^K_a+\varepsilon_i\right\},
+\varepsilon_i\sim\mathcal{N}(0,\sigma_K^2),
+\end{align*}
+where $\delta^K_a $ is an auction fixed effect.
+
+Finally, I estimate the equilibrium bid price distribution $f_{b^\ast} = \mathcal{N}(\delta^b_a,\sigma_b^2)$, where $\delta^b_a $ is an auction fixed effect, by maximizing a pseudo-likelihood constructed from the marginal distributions of the observed order statistics. For bidder $i$ with observed bid price $b_i^d $ and bid price rank $brank_i $, counted from the lowest within the auction, the marginal log-density, omitting terms that do not depend on the parameters, is
+\begin{align*}
+\ln f_{b^\ast}(b_i^d) + (brank_i-1) \ln F_{b^\ast}(b_i^d) + (N-brank_i) \ln (1-F_{b^\ast}(b_i^d)),
+\end{align*}
+where $F_{b^\ast} $ is the CDF for the equilibrium bid price distribution. Because order statistics from the same auction are dependent, summing these marginal log densities does not produce their joint likelihood. I use their sum as a marginal pseudo-likelihood. I specify the procurement capacity distribution $f_D$ in the same way as for descending-clock auctions in equation~\eqref{eq:proccapacity} in Online Appendix \ref{sec:dcprice}.
+
+I then compute the (symmetric) equilibrium winning probability function $W^\ast $ by simulation. Consider a sealed-bid auction with $N$ participants, wholesale market variance $\sigma_r^2$ specified in Online Appendix \ref{sec:spotvar}, estimated expected wholesale price $\hat{\mu}_{r}$ from the first step in Section \ref{paper-sec:estimation}, specified procurement capacity distribution $f_D$, and estimated distributions $\hat{f}_{C | b^\ast}$, $\hat{f}_{K|C,b^\ast}$, and $\hat{f}_{b^\ast}$. The following simulation procedure computes $W^\ast $ in this auction according to the definition of the winning probability function in equation~\eqref{paper-eq:winprob} in Section \ref{paper-sec:sb}:
+\begin{enumerate}
+
+\item
+For each $s=1,\dots,S $, draw a procurement capacity $D^s \sim f_D $. For each competitor $j=1,\dots,N-1$, draw
+\begin{align*}
+(b_j^\ast)^s\sim\hat{f}_{b^\ast},
+Capacity_j^s\sim\hat{f}_{C|b^\ast}(\cdot|(b_j^\ast)^s), \text{ and }
+K_j^s\sim\hat{f}_{K|C,b^\ast}(\cdot|Capacity_j^s,(b_j^\ast)^s).
+\end{align*}
+
+\item
+Calculate the risk aversion coefficient $\hat{\gamma}_j^s $ for each competitor $j$ using the first-step structural parameter estimates as $\hat{\gamma}_j^s=\exp\{\hat{\alpha}_{\gamma 0}+\hat{\alpha}_{\gamma 1}\log(1+K_j^s)\}$.
+
+\item
+Compute the equilibrium winning probability function as
+\begin{align*}
+\hat{W}^\ast(b) = \frac{1}{S} \sum_{s=1}^{S} \I \left\{ \sum_{j=1}^{N-1} (\hat{q}^\ast((b_j^\ast)^s | \hat{\gamma}_j^s,\underline{q}_j^s,\bar{q}_j^s) \times Capacity_j^s) \I((b_j^\ast)^s < b) < D^s \right\},
+\end{align*}
+where $\hat{q}^\ast$ is the optimal bid share function as in Section \ref{paper-sec:sb} with the first-step estimates and project-specific support $[\underline{q},\bar{q}]$ calculated for each draw:
+\begin{align}
+\label{eq:optqsbhat}
+\hat{q}^\ast(b | \gamma,\underline{q},\bar{q}) \coloneqq \min \left\{\max \left\{\underline{q}, 1 - \frac{\hat{\mu}_{r} - \tilde{\delta} b}{\gamma \sigma_r^2} \right\}, \bar{q} \right\}.
+\end{align}
+
+\end{enumerate}
+
+I smooth the indicator functions in the last step using a normal CDF, denoted $\Phi $, following \citet{Ryan2026}. The indicator function for the bid price, $\I(b' < b) $, is smoothed as $\Phi((b-b')/h_b) $, where I set the bandwidth parameter to be $h_b = $ \$$2$/MWh, about 1/30 of the level of a typical bid. The indicator function for the procurement capacity, $\I(D' < D) $, is smoothed as $\Phi((D-D')/h_D) $, where I set the bandwidth parameter to be $h_D = $ 15 MW, about 1/30 of the level of a typical procurement capacity. I calculate $\hat{W}^\ast(b)$ for a grid of $b$ with \$\input{snt/grid_interval}/MWh increments, retain only values for which $\hat{W}^\ast(b) \in [0.01,0.99]$, and linearly interpolate between the grid points. I simulate $S = 2000 $ times and numerically differentiate $\hat{W}^\ast(b) $ to obtain the derivative $d\hat{W}^\ast(b)/db $.
+
+
+\subsection{Sealed-Bid Auction Risk Aversion-Cost Distribution}
+\label{sec:gammacostsimulation}
+
+Consider a sealed-bid auction with minimum possible bid share $\underline{q}$, wholesale market variance $\sigma_r^2$ specified in Online Appendix \ref{sec:spotvar}, estimated expected wholesale price $\hat{\mu}_{r}$ from the first step in Section \ref{paper-sec:estimation}, estimated distributions $\hat{f}_{C | b^\ast}$, $\hat{f}_{K|C,b^\ast}$, and $\hat{f}_{b^\ast}$, and winning probability function $\hat{W}^\ast $ from Online Appendix \ref{sec:winprob}. Here, $c$ denotes the effective cost defined in Section \ref{paper-sec:model}. The following simulation procedure computes the participants' joint distribution of risk aversion and cost, $f_{\gamma,c}$, in this auction:
+\begin{enumerate}
+
+\item
+For each $s=1,\dots,S$, draw
+\begin{align*}
+b_s^\ast\sim\hat{f}_{b^\ast},
+Capacity_s\sim\hat{f}_{C|b^\ast}(\cdot|b_s^\ast),\text{ and }
+K_s\sim\hat{f}_{K|C,b^\ast}(\cdot|Capacity_s,b_s^\ast).
+\end{align*}
+
+\item
+Calculate the risk aversion coefficient $\hat{\gamma}_s$ using the first-step structural parameter estimates: $\hat{\gamma}_s=\exp\{\hat{\alpha}_{\gamma 0}+\hat{\alpha}_{\gamma 1}\log(1+K_s)\}$.
+
+\item
+Invert the optimal bid price condition in equation~\eqref{paper-eq:optbsb} in Section \ref{paper-sec:sb} with $q_s^\ast = \hat{q}^\ast(b_s^\ast | \hat{\gamma}_s,\underline{q}_s,\bar{q}_s) $ using $\hat{q}^\ast$ defined in equation~\eqref{eq:optqsbhat} in Online Appendix \ref{sec:winprob} and project-specific support $[\underline{q}_s,\bar{q}_s]$ calculated for each draw:
+\begin{align*}
+\hat{c}_s
+= q_s^\ast \tilde{\delta} b_s^\ast + \left(1-q_s^\ast\right)\hat{\mu}_{r}
+- \frac{\hat{\gamma}_s}{2}\left(1-q_s^\ast\right)^2 \sigma_r^2
+- \frac{1}{\hat{\gamma}_s} \ln \left(-\frac{\hat{\gamma}_s q_s^\ast \tilde{\delta} \hat{W}^{\ast}(b_s^\ast)}{d\hat{W}^{\ast}(b_s^\ast)/db} +1 \right).
+\end{align*}
+
+\end{enumerate}
+
+I use the simulated draws $\{(\hat{\gamma}_s,\hat{c}_s)\}_{s=1}^S$ to compute the summary statistics of $f_{\gamma,c}$. I simulate $S = 10,000$ times for each sealed-bid auction.
+
+\clearpage
+
+\section{Supplementary Structural Values and Results}
+\label{sec:suppstructural}
+
+\setcounter{table}{0}
+\setcounter{figure}{0}
+\renewcommand{\thetable}{\Alph{section}\arabic{table}}
+\renewcommand{\thefigure}{\Alph{section}\arabic{figure}}
+
+\begin{table}[htb!]
+\caption{Annual wholesale price process parameter estimates}
+\label{tab:spotestimates}
+\centering
+\input{table/spotestimates}
+\tabnote{Notes: Parameter estimates for the mean reverting process of annual wholesale prices in Online Appendix \ref{sec:spotvar}. Annual spot prices (\$/MWh) from 2001 to 2022 are used in the estimation. Standard errors (in parentheses) are calculated using the outer product approximation method for maximum likelihood estimation. The implied wholesale price standard deviation (SD), $\sigma_r $, ranges from \$\input{snt/sigma2_r_min}/MWh to \$\input{snt/sigma2_r_max}/MWh across \input{snt/auction_N} auctions (\input{snt/auction_N_sb} sealed-bid and \input{snt/auction_N_dc} descending-clock auctions).}
+\end{table}
+
+\begin{table}[htb!]
+\caption{Prespecified auction distribution parameter values}
+\label{tab:prespecdist}
+\centering
+\input{table/prespecdist}
+\tabnote{Notes: The parameter values maximize the likelihood of the observed log procurement capacities (MW) in Panel A, using \input{snt/auction_N_sb_nomissing} sealed-bid auctions (for which participant counts are available) and \input{snt/auction_N_dc} descending-clock auctions, and of the observed clearing prices (\$/MWh) in Panel B, using the \input{snt/auction_N_dc} descending-clock auctions. The forecasted marginal cost is the average of the 6th to 10th years of the ten-year forecasts of the marginal cost of operation of the Brazilian power system (Custo Marginal de Operação) at the time of the auction, collected from EPE's Ten-Year Energy Expansion Plan \citep{EPE2026}. The operation start is defined as the year since the beginning of 2010. The expected procurement capacity ranges from \input{snt/exp_proccapacity_sb_min} MW to \input{snt/exp_proccapacity_sb_max} MW across \input{snt/auction_N_sb_nomissing} sealed-bid auctions and \input{snt/exp_proccapacity_dc_min} MW to \input{snt/exp_proccapacity_dc_max} MW across \input{snt/auction_N_dc} descending-clock auctions. Across the \input{snt/auction_N_dc} descending-clock auctions, the expected clearing price $\mu_{p^\ast}$ ranges from \$\input{snt/exp_clearprice_min}/MWh to \$\input{snt/exp_clearprice_max}/MWh, and its SD $\sigma_{p^\ast}$ is \$\input{snt/clearprice_sd}/MWh.}
+\end{table}
+
+\begin{figure}[htb!]
+\caption{Goodness of fit: Observed and model-predicted bid shares}
+\label{fig:bidshare_gof}
+\centering
+\begin{subfigure}{0.49\textwidth}
+\caption{Cumulative distribution function (CDF)}
+\label{fig:bidshare_cdf_gof}
+\includegraphics[width=\textwidth]{bidshare_cdf_gof.png}
+\end{subfigure}
+\hfill
+\begin{subfigure}{0.49\textwidth}
+\caption{Mean by purchase agreement price}
+\label{fig:bidshare_price_gof}
+\includegraphics[width=\textwidth]{bidshare_price_gof.png}
+\end{subfigure}
+
+\begin{subfigure}{0.49\textwidth}
+\caption{Mean by prior started wind capacity}
+\label{fig:bidshare_prior_capacity_gof}
+\includegraphics[width=\textwidth]{bidshare_prior_capacity_gof.png}
+\end{subfigure}
+\hfill
+\begin{subfigure}{0.49\textwidth}
+\caption{Mean by forecasted marginal cost}
+\label{fig:bidshare_mc_gof}
+\includegraphics[width=\textwidth]{bidshare_mc_gof.png}
+\end{subfigure}
+\fignote{Notes: The sample consists of all \input{snt/bidder_N} winning bids in \input{snt/auction_N_sb} sealed-bid and \input{snt/auction_N_dc} descending-clock auctions from \input{snt/auction_year_min} to \input{snt/auction_year_max}. Panel (a) compares the cumulative distributions of observed and model-predicted bid shares. Panel (b) groups bids into purchase agreement price deciles. Panel (c) places projects with zero prior started wind capacity in a separate bin and divides projects with positive prior capacity into quartiles. Panel (d) divides the auctions into quintiles by forecasted marginal cost. Panels (b)--(d) plot the observed and predicted mean bid shares against the mean horizontal-axis variable in each bin. Model predictions integrate over the bid share shock and, in descending-clock auctions, the latent equilibrium bid price.}
+\end{figure}
+
+\begin{table}[htb!]
+\caption{Distribution parameter estimates for equilibrium bid price, capacity, and prior started wind capacity ($K$)}
+\label{tab:winprobparam}
+\centering
+\resizebox{\linewidth}{!}{\input{table/winprobparam}}
+\tabnote{Notes: Parameter estimates for the equilibrium bid price, capacity, and prior started wind capacity distributions used to calculate the equilibrium winning probability function for each sealed-bid auction as described in Online Appendix \ref{sec:winprob}. The bid price distribution is estimated using the marginal order-statistic pseudo-likelihood based on \input{snt/bidder_N_sb_nomissing} winning bids in the \input{snt/auction_N_sb_nomissing} sealed-bid auctions for which participant counts are available. The log capacity distribution is estimated using \input{snt/bidder_N_sb} winning bids in all \input{snt/auction_N_sb} sealed-bid auctions. The prior started wind capacity ($K$) distribution is estimated using \input{snt/prior_capacity_estimation_bidder_N} winning bids in the \input{snt/prior_capacity_estimation_auction_N} sealed-bid auctions in which a positive value is possible. The auction identifier is in chronological order. Standard errors (in parentheses) are calculated using \input{snt/bs_num} bootstrap replications that resample firms globally. The expected capacity ranges from \input{snt/capacity_mean_min} MW to \input{snt/capacity_mean_max} MW across \input{snt/auction_N_sb_nomissing} sealed-bid auctions used in the equilibrium winning probability function calculation.}
+\end{table}
+
+\begin{figure}[htb!]
+\centering
+\caption{Estimated equilibrium winning probability functions and the predicted winning probabilities of the observed winning bids}
+\label{fig:winprob}
+\includegraphics[width=\textwidth]{winprob.png}
+\fignote{Notes: The solid curves plot the estimated equilibrium winning probability function for each sealed-bid auction. The points show the predicted winning probabilities evaluated at the observed winners' bid prices. The auction identifier is in chronological order.}
+\end{figure}
+
+\clearpage
+
+\begin{figure}[htb!]
+\caption{Linear projection of the participants' cost distribution}
+\label{fig:c_dist_lp}
+\begin{subfigure}{0.49\textwidth}
+\centering
+\caption{Cost trend setting lead time $= 0$}
+\label{fig:c_dist_lp_t_l0}
+\includegraphics[width=\textwidth]{c_dist_lp_t_l0.png}
+\end{subfigure}
+\begin{subfigure}{0.49\textwidth}
+\centering
+\caption{Lead time coefficient trend}
+\label{fig:c_dist_lp_l_by_t}
+\includegraphics[width=\textwidth]{c_dist_lp_l_by_t.png}
+\end{subfigure}
+\fignote{Notes: The figures are based on the linear projection in Table \ref{tab:cost_dist_lp}. Panel (a) plots the fitted cost trend over auction dates, setting the lead time to zero. \citet{Tolmasquim2021} report two factors that explain the 2012--2015 upward trend: the 2014 bankruptcy of a large local equipment provider and the rise in Brazil's base interest rate. Panel (b) plots the lead time coefficient by auction date for the main and undiscounted specifications. Given typical lead times of 2 to 5 years, the inverse U-shaped pattern aligns with the cost decline from 2010 to 2012, the cost hike from 2012 to 2015, and the engineering cost decline after 2017 reported in \citet{EPE2022b}. Dashed lines show pointwise 95\% confidence intervals calculated using \input{snt/bs_num} bootstrap replications that resample firms globally.}
+\end{figure}
+
+\begin{table}[htb!]
+\caption{Linear projection of the estimated cost distribution}
+\label{tab:cost_dist_lp}
+\centering
+\input{table/cost_dist_lp}
+\tabnote{Notes: The values are estimated using the \input{snt/auction_N_sb_nomissing} sealed-bid auctions (used in the cost estimation) from \input{snt/auction_year_min_sb} to \input{snt/auction_year_max_sb}. The main specification column uses the estimated cost distribution. Before estimating the linear projection, the undiscounted specification divides estimated cost by $\delta^l$, where $\delta$ is the annual discount factor and $l$ is project lead time in years. The auction date is defined as the year since the beginning of 2010. Standard errors (in parentheses) are calculated using \input{snt/bs_num} bootstrap replications that resample firms globally.}
+\end{table}
+
+\begin{table}[htb!]
+\caption{Sensitivity analysis: Winners' average risk premium, cost, and markup}
+\label{tab:sa_rp_cost}
+\centering
+\input{table/sa_rp_cost_markup}
+\tabnote{Notes: Values are capacity weighted averages across the \input{snt/bidder_N_sb_nomissing} winners in \input{snt/auction_N_sb_nomissing} sealed-bid auctions (used in the cost estimation) from \input{snt/auction_year_min_sb} to \input{snt/auction_year_max_sb}. Panel A scales the standard deviation (SD) of the shock in the wholesale price mean reverting process ($\sigma_\xi$ in Section \ref{sec:spotvar}) from \input{snt/sa_sd_multiplier_min_pct} to \input{snt/sa_sd_multiplier_max_pct} of its main value, \$\input{snt/sa_sigma_xi_main}/MWh. Panel B shifts the main specification of the clearing price mean, $\mu_{p^\ast} =$ \$\input{snt/exp_clearprice_min}--\$\input{snt/exp_clearprice_max}/MWh, which varies across auctions, by the indicated numbers of its SDs. Panel C scales the main specification of the clearing price SD, $\sigma_{p^\ast} =$ \$\input{snt/clearprice_sd}/MWh, to \input{snt/sa_sd_multiplier_min_pct}--\input{snt/sa_sd_multiplier_max_pct} of its value. Panel D changes the discount factor from $\delta =$ \input{snt/sa_delta_main} (Main).}
+\end{table}
+
+\clearpage
+
+\section{Counterfactual Design and Computation}
+\label{sec:counterfactual_computation}
+\setcounter{figure}{0}
+\setcounter{table}{0}
+
+\textbf{Outside payoff and cost reductions.} The auction model identifies baseline effective cost, $c_i(0)=c_i^{physical}+\pi_{0i}(0)$, where the argument zero denotes the factual environment with no counterfactual physical cost reduction. It does not separately identify physical cost and the outside payoff. I assume that the wholesale outside payoff floor does not bind for auction participants during the estimation period, so $\pi_{0i}(0)=0$ and the estimated baseline effective cost equals physical cost, $c_i(0)=c_i^{physical}$. Consistent with this assumption, no participant draw reaches the floor in the factual simulation.
+
+Let $\Delta c\geq0$ denote a physical cost reduction, in dollars per MWh, applied to every project in the baseline participant distribution constructed from the estimates. For the counterfactual, I specify the outside payoff after this cost reduction as
+\begin{align*}
+\pi_{0i}(\Delta c)
+\coloneqq\max\left\{0,\mu_r-(c_i^{physical}-\Delta c)
+-\frac{\gamma_i\sigma_r^2}{2}\right\}.
+\end{align*}
+Thus, a project builds without auction support when its certainty equivalent profit from selling all production in the wholesale market is positive. The resulting effective cost is
+\begin{align*}
+c_i(\Delta c)
+\coloneqq (c_i^{physical}-\Delta c)+\pi_{0i}(\Delta c)
+=\max\left\{c_i(0)-\Delta c,
+\mu_r-\frac{\gamma_i\sigma_r^2}{2}\right\}.
+\end{align*}
+The expression applies a physical cost reduction to the estimated baseline and then incorporates the resulting outside payoff. Projects at the floor are viable without auction support and are counted as capacity built without auction support when they do not receive it.
+
+\textbf{Representative synthetic auction and primitive distribution.} I construct and use one representative synthetic auction, providing one common environment for comparing auction formats and physical cost reductions. I set its number of registered projects to the median across the factual sealed-bid auctions. Multiplying this count by the aggregate observed participant--registrant ratio determines the representative expected number of participants. I set the discounting term $\tilde\delta$, expected wholesale price $\mu_r$, and wholesale market variance $\sigma_r^2$ using participant weighted averages across the factual auctions.
+
+I retain uncertainty in procurement conditions when constructing the distribution of the objective capacity $\widetilde D$. For each draw, I sample a factual sealed-bid auction with probability proportional to its number of participants and simulate bid prices, capacities, bid shares, and procurement capacity using that auction's estimated environment. In the resulting simulated factual auction, let $Q_i=q_iCapacity_i$, order projects by bid price, and let $M$ be the first project such that $\sum_{j=1}^M Q_j\geq D$. I map procurement capacity into installed capacity according to $\widetilde D=\sum_{j=1}^{M-1}Capacity_j+(D-\sum_{j=1}^{M-1}Q_j)/Q_M \cdot Capacity_M$. I then normalize each $\widetilde D$ draw by the factual auction's expected aggregate participant capacity and rescale it by the representative synthetic auction's expected aggregate participant capacity. This prorating and rescaling are calibration conventions for constructing the continuous distribution of $\widetilde D$. Counterfactual allocations still award full projects. Conditional on counterfactual bids, project $i$ wins when $\sum_{j\neq i}Capacity_j\I(b_j<b_i)<\widetilde D$. Thus, every competitor contributes its full installed capacity toward the counterfactual cutoff, independently of the purchase agreement share.
+
+Project characteristics follow the representative primitive and capacity distributions. The representative primitive moments are the capacity weighted averages of the within-auction statistics in Table \ref{paper-tab:gamma_cost_dist}. To retain risk aversion selection while making equilibrium computation stable, I approximate the baseline participant risk aversion distribution by two equally weighted types, $\gamma_L$ and $\gamma_H$, chosen to match the estimated mean $E[\gamma]=\input{snt/cf_gamma_mean_reference}$ and the estimated standard deviation of $\log\gamma$, $\input{snt/cf_loggamma_sd_reference}$. The cost distribution matches the estimated representative mean and variance, and its dependence on risk aversion matches the estimated correlation $\corr(\gamma,c)=\input{snt/cf_rho_reference}$. Capacity is drawn independently of $(\gamma,c)$ from the model-implied participant capacity distribution pooled across auctions using participant-count weights.
+
+Let $x_i\coloneqq c_i-(\mu_r-\gamma_i\sigma_r^2/2)\geq0$ denote project $i$'s effective cost above the wholesale outside payoff floor. Once I recover the registered project pool as described below, I define, for $g\in\{L,H\}$, $F_x(x\mid\gamma_g)\coloneqq\Pr(x_i\leq x\mid\gamma_i=\gamma_g)$. I approximate each \(F_x(\cdot\mid\gamma_g)\) by a weighted Gaussian kernel distribution using simulated draws of project characteristics $(\gamma_i,c_i,Capacity_i)$ and their recovered registered pool weights. The smooth cumulative distribution function (CDF) and density allow me to evaluate the mass below each deterministic type-specific participation cutoff and the derivatives required by the differential system.
+
+\textbf{Auction formats and equilibrium bids.} In the bidder share choice auction, a candidate bid and risk aversion draw imply the optimal purchase agreement share
+\begin{align*}
+q_i=q(b_i\mid\gamma_i)
+\coloneqq\min\left\{1,\max\left\{0,
+1-\frac{\mu_r-\tilde{\delta} b_i}
+{\gamma_i\sigma_r^2}\right\}\right\}.
+\end{align*}
+In a fixed share auction, I instead set $q_i=\lambda$, where $\lambda$ is the share of electricity for which the policymaker bears wholesale market sales risk. Bidders submit a transfer bid per MWh of total production rather than a price per MWh allocated to the purchase agreement. A winner supplies share $\lambda$ through the purchase agreement but receives its transfer bid per MWh of total production. When $\lambda=0$, the winner sells all production in the wholesale market and the transfer bid is a subsidy. By contrast, in the bidder share choice auction, the bid price applies per MWh allocated to the purchase agreement. The choice $q_i=0$ is an outside action: the project does not participate in the auction and builds only for the wholesale market if viable.
+
+Let $\widetilde W^\ast(b)$ denote a participant's counterfactual equilibrium winning probability when bidding $b$ under the objective capacity allocation rule. I suppress the equilibrium superscript below and write the function and its bid derivative as $\widetilde W(b)$ and $\widetilde W'(b)=d\widetilde W(b)/db$. For a participant with $\gamma_i=\gamma_g$, the certainty equivalent of revenue conditional on winning is
+\begin{align*}
+R(b\mid\gamma_g)
+\coloneqq
+\begin{cases}
+\begin{aligned}
+&q(b\mid\gamma_g)\tilde{\delta}b
++[1-q(b\mid\gamma_g)]\mu_r\\
+&\quad-\dfrac{\gamma_g\sigma_r^2}{2}[1-q(b\mid\gamma_g)]^2
+\end{aligned}
+& \text{under bidder share choice},\\
+\tilde{\delta}b+(1-\lambda)\mu_r
+-\dfrac{\gamma_g\sigma_r^2}{2}(1-\lambda)^2
+& \text{under a fixed share}.
+\end{cases}
+\end{align*}
+Taking the derivative of $R(b\mid\gamma_g)$ with respect to the bid price yields $R_b(b\mid\gamma_g) = q(b\mid\gamma_g)\tilde{\delta}$ under bidder share choice and $R_b(b\mid\gamma_g) = \tilde{\delta}$ under a fixed share. The bidder share choice result follows from the envelope theorem.
+
+Equilibrium participation follows a risk aversion type specific cutoff rule. To see this, fix $\gamma_g$, let $u_g(\pi)=[1-\exp(-\gamma_g\pi)]/\gamma_g$, and write expected utility as $\mathrm{EU}(b\mid\gamma_g,c_i)=\widetilde W(b)u_g(R(b\mid\gamma_g)-c_i)$. Expected utility from every bid decreases with cost because $\widetilde W(b)>0$ implies $\partial\mathrm{EU}(b\mid\gamma_g,c_i)/\partial c_i=-\widetilde W(b)u_g'(R(b\mid\gamma_g)-c_i)<0$. Thus, the optimized auction value decreases with cost, and comparison of the optimized auction value with the fixed qualification cost gives a participation cutoff for each risk aversion type.
+
+Among participants,
+\begin{align*}
+\frac{\partial^2\mathrm{EU}(b\mid\gamma_g,c_i)}{\partial b\,\partial c_i}
+&=-\widetilde W'(b)u_g'(R(b\mid\gamma_g)-c_i)
+-\widetilde W(b)u_g''(R(b\mid\gamma_g)-c_i)R_b(b\mid\gamma_g)\\
+&=u_g'(R(b\mid\gamma_g)-c_i)
+\left[-\widetilde W'(b)
++\gamma_g\widetilde W(b)R_b(b\mid\gamma_g)\right]>0,
+\end{align*}
+because $\widetilde W'(b)<0$, $\widetilde W(b)>0$, and $R_b(b\mid\gamma_g)\geq0$. I choose the bid price domain sufficiently wide that equilibrium bid prices are interior. At the unique optimal bid price, the strict second order condition and the implicit function theorem imply $\frac{db^\ast}{dc_i}=-\frac{\partial^2\mathrm{EU}(b^\ast\mid\gamma_g,c_i)/\partial b\,\partial c_i}{\partial^2\mathrm{EU}(b^\ast\mid\gamma_g,c_i)/\partial b^2}>0$. Thus, the equilibrium bid price is strictly increasing in cost within each risk aversion type. Since $x_i$ differs from $c_i$ only by a constant conditional on $\gamma_g$, $db^\ast/dx_i=db^\ast/dc_i>0$. Consequently, for any $b$ in the participant bid support, strict monotonicity gives a unique cutoff of $x_i$ for participating and bidding below $b$, denoted $\bar{x}_g(b,K)$, such that
+\begin{align*}
+\{\text{project $i$ participates and }b_i^\ast\leq b\}
+\Longleftrightarrow
+\{x_i\leq\bar{x}_g(b,K)\}
+\text{ conditional on }\gamma_i=\gamma_g.
+\end{align*}
+
+To derive $\bar{x}_g(b,K)$, define the certainty equivalent of profit conditional on winning as $\mathrm{CE}(b\mid\gamma_g,c_i)\coloneqq R(b\mid\gamma_g)-c_i$. The optimal bid price condition is
+\begin{align*}
+0
+&=\frac{d}{db}\left\{\widetilde W(b)u_g(\mathrm{CE}(b\mid\gamma_g,c_i))\right\}\\
+&=\frac{\widetilde W'(b)}{\gamma_g}
+\left\{1-\exp[-\gamma_g\mathrm{CE}(b\mid\gamma_g,c_i)]\right\}
++\widetilde W(b)\exp[-\gamma_g\mathrm{CE}(b\mid\gamma_g,c_i)]R_b(b\mid\gamma_g).
+\end{align*}
+Using $K(b)\coloneqq-\widetilde W(b)/\widetilde W'(b)>0$ and rearranging gives
+\begin{align*}
+\mathrm{CE}(b\mid\gamma_g,c_i)
+=\mathrm{CE}(b\mid\gamma_g,K)
+=\frac{1}{\gamma_g}\log\left[1+\gamma_gK(b)R_b(b\mid\gamma_g)\right].
+\end{align*}
+I change the arguments of $\mathrm{CE}$ because the last expression no longer contains $c_i$ and instead depends on the equilibrium function $K$ evaluated at $b$.
+
+The type $\gamma_g$ project whose equilibrium bid price satisfies $b_i^\ast=b$ has $c_i=\bar{x}_g(b,K)+\mu_r-\gamma_g\sigma_r^2/2$. Substituting this expression into the definition of $\mathrm{CE}$ and solving for $\bar{x}_g(b,K)$ gives
+\begin{align*}
+\bar{x}_g(b,K)
+=R(b\mid\gamma_g)-\mathrm{CE}(b\mid\gamma_g,K)
+-\left(\mu_r-\frac{\gamma_g\sigma_r^2}{2}\right).
+\end{align*}
+The probability that a potential competitor $j \neq i$ participates and bids below $b$ is therefore
+\begin{align}
+\label{eq:appx_cf_lower_bid_probability}
+P(b,K)=\sum_{g\in\{L,H\}}\Pr(\gamma_j=\gamma_g)F_x(\bar{x}_g(b,K)\mid\gamma_g).
+\end{align}
+With $N_R$ registered projects, the number of bidder $i$'s competitors that participate and bid below $b$ follows $\operatorname{Binomial}(N_R-1,P)$. Because capacity is independent of strategic type $(\gamma_i,c_i)$, bidder $i$'s winning probability conditional on $k$ such competitors is $A_k\coloneqq\Pr(\sum_{j=1}^k Capacity_j<\widetilde D)$, where the probability integrates over the common capacity distribution and the $\widetilde D$ distribution. The winning probability can then be written as
+\begin{align}
+\label{eq:appx_cf_winning_probability}
+H(P)
+\coloneqq\sum_{k=0}^{N_R-1}\binom{N_R-1}{k}
+P^k(1-P)^{N_R-1-k}A_k,
+\end{align}
+and $\widetilde W$ satisfies $\widetilde W(b)=H(P(b,K))$. I evaluate each $A_k$ numerically by simulation.
+
+Because strict bid price monotonicity makes $P(b,K)$ increasing in $b$ along the equilibrium path, I use $P$ as the independent variable of the ordinary differential equation system and solve for $b(P)$ and $K(P)$. Differentiating $\widetilde W(b)=H(P(b,K))$ and $P=P(b(P),K(P))$ along the equilibrium path gives
+\begin{align*}
+\widetilde W'(b)=H'(P)\frac{dP}{db}
+\quad\text{and}\quad
+1=P_b(b,K)\frac{db}{dP}+P_K(b,K)\frac{dK}{dP},
+\end{align*}
+where $H'(P)=dH(P)/dP<0$ and $P_b$ and $P_K$ are the partial derivatives of $P(b,K)$. Combining the first expression with $K=-\widetilde W/\widetilde W'$ and rearranging the second gives the joint system
+\begin{align}
+\label{eq:appx_cf_joint_ode}
+\frac{db}{dP}
+=-\frac{H'(P)K}{H(P)}>0
+\text{ and }
+\frac{dK}{dP}
+=\frac{1-P_b(b,K) \cdot db/dP}{P_K(b,K)}.
+\end{align}
+The system is well defined wherever $P_K(b,K)\neq0$, which holds along the computed equilibrium paths.
+
+To facilitate the equilibrium computation, I require the equilibrium participant bid price distributions for the two risk aversion types to share a common upper support $\bar b$. Because both types face the same equilibrium winning probability function, the common upper bid price also implies a single boundary value $\bar K=-\widetilde W(\bar b)/\widetilde W'(\bar b)$. The value of $\bar K$ is not determined by $\bar b$ alone because the winning probability function is an equilibrium object, so I determine the pair $(\bar b,\bar K)$ jointly. Conditional on $(\bar b,\bar K)$, equation \eqref{eq:appx_cf_joint_ode} determines a unique bidding path while allowing the risk aversion type specific participation cutoffs $\bar{x}_g(\bar b,\bar K)$ to differ. I integrate the system downward from this common boundary using a classical fourth order Runge--Kutta scheme in $(b,\log K)$ \citep*{Hairer1993}. Because the common upper support restriction is a computational approximation, I assess its reasonableness by comparing each risk aversion type's implied marginal auction value with the common qualification cost across counterfactuals.
+
+\textbf{Participation and qualification cost calibration.} I model participation following \citet{Bolotnyy2023}. Payoffs and utility are normalized relative to each project's outside payoff in the counterfactual scenario, i.e., losing gives an incremental payoff of zero and $u_g(0)=0$, even when construction without auction support is viable. Because CARA preferences are invariant to additive shifts by a certain payoff, this normalization does not affect bidding or participation choices.
+
+Let $V_i$ denote project $i$'s per MWh certainty equivalent of its optimized win-or-lose auction payoff before paying the qualification cost. For a project with $\gamma_i=\gamma_g$,
+\begin{align*}
+u_g(V_i)
+=\widetilde W(b_i^\ast)u_g\left(\mathrm{CE}(b_i^\ast\mid\gamma_g,c_i)\right)
++\left[1-\widetilde W(b_i^\ast)\right]u_g(0).
+\end{align*}
+Using $u_g(0)=0$ and the CARA utility function gives
+\begin{align}
+V_i
+=-\frac{1}{\gamma_g}
+\log\left[1-\widetilde W(b_i^\ast)
+\left\{1-\exp\left[-\gamma_g\mathrm{CE}(b_i^\ast\mid\gamma_g,c_i)\right]\right\}\right].
+\label{eq:appx_cf_entry_value}
+\end{align}
+I assume that qualification cost is constant per MWh at $\kappa$, so project $i$ participates if $V_i\geq\kappa$. Evaluating equation \eqref{eq:appx_cf_entry_value} at the common upper support $b_i^\ast=\bar b$ and using $\mathrm{CE}(\bar b\mid\gamma_g,\bar K)$ gives the marginal auction value for risk aversion type $\gamma_g$,
+\begin{align*}
+\bar V_g
+=-\frac{1}{\gamma_g}
+\log\left[1-\widetilde W(\bar b)
+\left\{1-\exp\left[-\gamma_g\mathrm{CE}(\bar b\mid\gamma_g,\bar K)\right]\right\}\right].
+\end{align*}
+
+I recover the registered project distribution by assigning weights to project draws from the primitive participant distribution. For draw $s = 1,\dots,S$, I specify
+\begin{align*}
+w_s(\alpha)
+=\frac{\exp\{\alpha^\top h(\gamma_s,c_s)\}}
+{\sum_{s'=1}^S \exp\{\alpha^\top h(\gamma_{s'},c_{s'})\}},
+\end{align*}
+where $h(\gamma,c)$ is a vector of standardized $\log\gamma$ and $c$, their centered squares, and their interaction. The weights represent how frequently each type appears among registered projects. To calibrate $\alpha$, I hold $\bar b$ fixed at the representative marginal participant bid anchor. I approximate the marginal participant's bid in each baseline sealed-bid auction $a$ by averaging the maximum of $N_a$ draws from that auction's fitted participant bid distribution over 5,000 simulations, where $N_a$ is its number of participants. I aggregate these auction specific marginal participant bids using participant count weights. For each candidate $\alpha$, I solve $\bar K$ so that applying the risk aversion type specific participation cutoffs $\bar x_g(\bar b,\bar K)$ to the weighted draws reproduces the observed participant--registrant ratio. I calibrate $\alpha$ so that the selected projects reproduce the primitive participant moments. Using the resulting weights $w_s(\alpha)$, the method inverts the model's participation selection: it recovers the registered project distribution that generates the primitive participant distribution after the baseline participation cutoffs are applied.
+
+The resulting common boundary $(\bar b,\bar K)$ and equations \eqref{eq:appx_cf_lower_bid_probability} and \eqref{eq:appx_cf_winning_probability} give $\widetilde W(\bar b)=H(P(\bar b,\bar K))$ and imply a marginal auction value $\bar V_g$ for each risk aversion type. I calibrate the common qualification cost to their probability weighted geometric mean,
+\begin{align}
+\log\kappa=\sum_{g\in\{L,H\}}\Pr(\gamma_i=\gamma_g)\log \bar V_g.
+\label{eq:appx_cf_kappa}
+\end{align}
+I recover the registered project distribution and calibrate $\kappa$ in the representative auction, then hold both fixed across auction formats and physical cost reductions. Counterfactual participation therefore changes through bidders' auction values rather than through changes in the underlying registered pool or qualification cost.
+
+The calibration gives $\kappa=\input{snt/cf_kappa_primary}$ dollars per MWh. This value is tiny because a project at the common upper support of participant bids is outbid by nearly every other participant and therefore has an extremely small probability of winning. Its magnitude depends on the representative auction size and objective capacity distribution, which determine the small tail winning probability \(\widetilde W(\bar b)\) of a marginal participant. When this winning probability is small, equation \eqref{eq:appx_cf_entry_value} implies that $\bar V_g$ is approximately proportional to $\widetilde W(\bar b)$. Thus, the value of $\kappa$ should be interpreted jointly with the winning probability schedule and its slope through $K=-\widetilde W/\widetilde W'$, rather than as an independently identified monetary qualification cost.
+
+\textbf{Equilibrium selection.} In each counterfactual, the two starting values $(\bar b,\bar K)$ satisfy the same aggregate marginal value condition as in equation \eqref{eq:appx_cf_kappa}. This condition does not uniquely determine both starting values. Therefore, for each auction format, I solve physical cost reductions sequentially from zero to \$10/MWh in \$1/MWh increments and, among starting values consistent with the calibrated qualification cost, minimize the scaled squared distance from the preceding scenario's solution, $\left(\frac{\bar b-\bar b^{preceding}}{h_{\bar b}}\right)^2+\left(\frac{\log\bar K-\log\bar K^{preceding}}{h_{\bar K}}\right)^2$. I set $h_{\bar b}=\$2$/MWh and $h_{\bar K}=0.5$ to place changes in the two boundary coordinates on comparable numerical scales. This continuation rule keeps equilibrium selection comparable across adjacent cost reduction scenarios. For bidder share choice at zero cost reduction, I use the calibrated baseline boundary as the preceding solution. For each fixed share path at zero cost reduction, I use that bidder share choice boundary as the preceding solution. Each subsequent scenario uses the preceding cost reduction solution from the same path.
+
+\textbf{Simulation.} I implement the numerical calculations as follows:
+\begin{enumerate}
+
+\item Generate 5,000 draws of participant types $(\gamma_i,c_i,Capacity_i)$ and 2,000 draws of $\widetilde D$.
+
+\item To evaluate $A_k$ in equation \eqref{eq:appx_cf_winning_probability}, for each $s=1,\ldots,1{,}000$, sample $\widetilde D^s$ from the 2,000 draws in step 1 and draw a sequence of $N_R-1$ competitor capacities from the participant capacity distribution. For every $k$, average the smoothed capacity cutoff indicator, $A_k=\frac{1}{1{,}000}\sum_{s=1}^{1{,}000} \Phi\left(\frac{\widetilde D^s-\sum_{j=1}^k Capacity_j^s}{h_{\widetilde D}}\right)$, where $\Phi$ is the standard normal CDF, and $h_{\widetilde D} =$ 15 MW is the same as the procurement capacity bandwidth used in the estimation. Calculate $H(P)$ and $H'(P)$ from equation \eqref{eq:appx_cf_winning_probability}. Combine this winning probability function with the participant draws in step 1 to recover the registered project distribution, construct $F_x(\cdot\mid\gamma_g)$, and solve participation and equilibrium strategies.
+
+\item For each scenario, simulate 2,000 representative auctions and take the average of the resulting allocations to calculate the expected winner composition, capacity, markup, and policy outcomes. In each simulation, set the participant count to the nearest integer to $N_RP(\bar b,\bar K)$. Draw participant characteristics from the registered project distribution recovered in step 2, conditional on participation, and draw $\widetilde D$ from the 2,000 draws constructed in step 1. Order projects by equilibrium bid price and award full projects until their cumulative capacity reaches $\widetilde D$.
+
+\end{enumerate}
+
+\textbf{Common upper support approximation evaluation.} The common upper support does not require each risk aversion type's marginal auction value to equal $\kappa$. I measure the approximation error by $\mathrm{res}_g=\log(\bar V_g/\kappa)$. Equation \eqref{eq:appx_cf_kappa} sets the probability weighted average of $\mathrm{res}_g$ to zero, so these residuals measure type specific deviations around the aggregate qualification cost calibration. The low risk aversion type residual is positive, while the high risk aversion type residual is negative because the low risk aversion type has a slightly higher certainty equivalent of profit conditional on winning at the common boundary in the computed equilibria. Across all scenarios, $\bar V_L$ is at most \input{snt/cf_common_support_low_value_above_max_pct} above $\kappa$, while $\bar V_H$ is at most \input{snt/cf_common_support_high_value_below_max_pct} below $\kappa$. These small deviations numerically support the common upper support approximation.
+
+%%% REFERENCE %%%
+\singlespacing
+\bibliographystyle{aer}
+\bibliography{uncertainty}
+
+
+\end{document}

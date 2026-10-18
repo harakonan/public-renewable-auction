@@ -1,0 +1,2 @@
+sample,observations,recovered_observations,recovered_weight,total_weight,missing_gamma,missing_risk_premium,missing_markup,missing_cost,active_auctions,active_auction_ids,active_observations,active_participants,active_total_capacity,asymptote_fallback_auctions,asymptote_fallback_auction_ids
+main,600,549,549.0,600.0,51,51,51,51,14,1;2;3;4;5;6;7;8;9;10;11;13;14;15,549,4776,119746.7,0,

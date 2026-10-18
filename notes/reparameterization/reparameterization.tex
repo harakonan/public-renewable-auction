@@ -1,0 +1,461 @@
+\documentclass[10pt]{article}
+\usepackage[margin=1in]{geometry}
+
+% phfnote is a package for short documentation
+% silence the warning associated with phfnote
+\usepackage{silence}
+\WarningFilter{latex}{Command \underbar  has changed.}
+\WarningFilter{latex}{Command \underline  has changed.}
+\usepackage[title=small]{phfnote}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{bm}
+\usepackage{bbm}
+\usepackage{mathtools}
+\allowdisplaybreaks
+\usepackage{multirow}
+
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{float}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{natbib}
+
+\DeclareMathOperator*{\plim}{plim}
+\DeclareMathOperator*{\var}{Var}
+\DeclareMathOperator*{\cov}{Cov}
+\DeclareMathOperator*{\corr}{corr}
+\DeclareMathOperator*{\rank}{rank}
+\DeclareMathOperator*{\tr}{tr}
+
+\newcommand{\indep}{\perp \!\!\! \perp}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\I}{\mathbbm1}
+\newcommand{\argmax}{\mathop{\rm arg~max}\limits}
+\newcommand{\argmin}{\mathop{\rm arg~min}\limits}
+
+% Theorem environments
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}
+\newtheorem{corollary}{Corollary}
+\newtheorem{lemma}{Lemma}
+\newtheorem{proposition}{Proposition}
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}
+\newtheorem{assumption}{Assumption}
+\newtheorem{remark}{Remark}
+
+\title{Reparameterization of the utility function}
+\author{Konan Hara}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+This note proposes a replacement for Section~\ref{sec:model} of the paper. It
+takes total project net present value (NPV) as the primitive payoff and
+distinguishes the bidder's absolute risk aversion over total NPV, $A_i$, from
+the effective risk-aversion coefficient governing choices expressed per unit
+of lifetime production, $\gamma_i=A_iK_i$. Here,
+$K_i\equiv Capacity_iHT$ denotes lifetime production. This reparameterization
+leaves the equilibrium bid-share equations, the sealed-bid cost inversion,
+and the descending-clock solution unchanged when written in terms of
+$\gamma_i$.
+
+\section{Structural Model of New Energy Auctions}
+\label{sec:model}
+
+I model bidders participating in a multi-unit procurement auction following
+the share auction framework of \citet{Wilson1979}. The distinguishing feature
+of the model is that bidders bid a share of production that they will include
+in the awarded long-term purchase agreement. Risk-averse bidders essentially
+make portfolio choices to allocate their total production across the
+risk-free purchase agreement and the risky wholesale market.\footnote{\label{fn:uncertainty}
+The production amount and purchase agreement price can be uncertain at the
+time of bidding due to intermittency and counterparty risk, respectively. The
+model can incorporate these uncertainties by specifying their distribution.
+The bidder's risk premium will then represent the risk premium for the
+wholesale market relative to the purchase agreement, and the bidder's cost
+will reflect the price he expects to receive, as in \citet{Ryan2026}.
+} Each bidder also bids one price per unit, which applies to all units of the
+purchase agreement.\footnote{
+The model is a special case of a multi-unit auction model because one price is
+applied to all units rather than bidding a price schedule along each share.
+}
+
+An auctioneer holds procurement auctions that guarantee the purchase of
+electricity at a fixed price for the entire life of a renewable technology,
+$T$. An auction at time $t=0$ is characterized by a lead time $l$, a number of
+participants $N$, a procurement capacity $D$, and a minimum possible bid
+share $\underline{q}\in[0,1]$. Qualified bidders, $i=1,\dots,N$, each with a
+new investment project, compete for the procurement capacity $D$. The
+procurement capacity is not disclosed before bidding, which makes it a random
+variable from the bidders' perspective. Bidders are required to allocate at
+least a share $\underline{q}$ of their total production to the purchase
+agreement.
+
+The purchase agreement spans discrete time
+$t=l,l+1,\dots,l+T-1$, since electricity supply begins at time $t=l$ and
+lasts for $T$ periods. Each period consists of $H$ hours. Bidder $i$ has
+generation capacity $Capacity_i$ and therefore produces
+$Capacity_iH$ units of electricity per period. Define
+\begin{align*}
+K_i\equiv Capacity_iHT
+\end{align*}
+as the project's lifetime production. Bidder $i$ specifies a share
+$q_i\in[\underline{q},1]$ and a price $b_i$ in his bid.\footnote{
+In practice, because bid quantities must be submitted in discrete units
+(integers in the first auction in 2009 and up to the first decimal place in
+subsequent auctions), the exact upper and lower bounds can deviate slightly
+from the nominal $\underline{q}$ and $1$ and vary at the project level. I
+maintain continuous, uniform bounds in the theoretical model for clarity and
+address these discrete project-level constraints in the estimation.
+} If bidder $i$ wins, the auctioneer agrees to purchase
+$q_iCapacity_iH$ units of electricity per period at price $p_i$, which is
+determined as a function of participants' bid prices
+$b_1,\dots,b_N$ according to the auction format. Bidder $i$ sells the
+remaining production, $(1-q_i)Capacity_iH$, to the wholesale market at price
+$r_t$. The auctioneer awards purchase agreements to the lowest bid prices
+until the total bid capacity of winners exceeds $D$. Thus, bidder $i$ wins
+when
+\begin{align*}
+\sum_{j\neq i}q_jCapacity_j\I(b_j\leq b_i)<D.
+\end{align*}
+
+When bidder $i$ wins, he incurs an upfront fixed cost $FC_i$ and variable cost
+$VC_{it}$ per unit of production in period $t$. His total project NPV is
+\begin{align}
+\label{eq:totalnpv}
+\Pi_i
+&\equiv
+\sum_{t=l}^{l+T-1}Capacity_iH\delta^t
+\left\{q_ip_i+(1-q_i)r_t-VC_{it}\right\}-FC_i \notag\\
+&=K_i\left\{q_i\widetilde{\delta}p_i+(1-q_i)r-c_i\right\},
+\end{align}
+where $\delta$ is a common discount factor,
+\begin{align*}
+\widetilde{\delta}
+\equiv \frac{1}{T}\sum_{t=l}^{l+T-1}\delta^t,
+\qquad
+r\equiv \frac{1}{T}\sum_{t=l}^{l+T-1}\delta^tr_t,
+\end{align*}
+and
+\begin{align*}
+c_i\equiv
+\frac{FC_i}{K_i}
++\frac{1}{T}\sum_{t=l}^{l+T-1}\delta^tVC_{it}
+\end{align*}
+is cost per unit of lifetime production. Although preferences are defined over
+total NPV, retaining $c_i$ in per-unit terms makes bid prices, costs, risk
+premiums, and markups directly comparable in dollars per unit of electricity.
+
+I assume that bidder $i$ has constant absolute risk aversion (CARA) over total
+project NPV:
+\begin{align*}
+U_i(\Pi\mid A_i)
+=\frac{1-\exp(-A_i\Pi)}{A_i},
+\qquad A_i>0,
+\end{align*}
+where $A_i$ is the Arrow--Pratt coefficient of absolute risk aversion over
+total NPV. Exponential utility is defined over the entire real line and is
+therefore compatible with projects having negative realizations of NPV. A
+concave utility over project NPV is a viable option for analyzing projects
+with uncertain cash flows in the field of decision analysis
+\citep{Hazen2009}.
+
+Define the effective risk-aversion coefficient
+\begin{align}
+\label{eq:effectivegamma}
+\gamma_i\equiv A_iK_i=A_iCapacity_iHT.
+\end{align}
+If $\pi_i\equiv\Pi_i/K_i$ denotes NPV per unit of lifetime production, then
+\begin{align}
+\label{eq:utilityequivalence}
+U_i(K_i\pi_i\mid A_i)
+=K_i u(\pi_i\mid\gamma_i),
+\qquad
+u(\pi\mid\gamma_i)
+\equiv\frac{1-\exp(-\gamma_i\pi)}{\gamma_i}.
+\end{align}
+For a bidder with predetermined capacity, $K_i$ is a positive constant that
+does not vary with the bid $(q_i,b_i)$. Hence, maximizing expected utility over
+total NPV is equivalent to maximizing the normalized per-unit utility on the
+right-hand side of equation~\eqref{eq:utilityequivalence}. Capacity affects
+the bidder's exposure mechanically through $K_i$, while $A_i$ measures the
+bidder's primitive attitude toward total project risk. Portfolio choices
+identify their product $\gamma_i=A_iK_i$; because $K_i$ is observed, they also
+identify $A_i$ under the model.
+
+I allow absolute risk aversion over total NPV to vary systematically with
+project capacity as
+\begin{align}
+\label{eq:Acapacity}
+A_i=\exp\!\left(\beta_{A0}+\beta_{A1}\log Capacity_i\right).
+\end{align}
+Equations~\eqref{eq:effectivegamma} and \eqref{eq:Acapacity} imply
+\begin{align}
+\label{eq:gammacapacity}
+\gamma_i
+=HT\exp(\beta_{A0})Capacity_i^{1+\beta_{A1}}.
+\end{align}
+Writing the effective-coefficient specification as
+$\log\gamma_i=\alpha_{\gamma0}+\alpha_{\gamma1}\log Capacity_i$ gives the
+parameter mapping
+\begin{align}
+\label{eq:parameter_mapping}
+\alpha_{\gamma0}=\log(HT)+\beta_{A0},
+\qquad
+\alpha_{\gamma1}=1+\beta_{A1}.
+\end{align}
+Thus, $\beta_{A1}=0$ corresponds to homogeneous absolute risk aversion over
+total project NPV, while the elasticity of the effective coefficient
+$\gamma_i$ with respect to capacity is one. A negative (positive)
+$\beta_{A1}$ means that larger projects have lower (higher) absolute risk
+aversion over total NPV. This parameterization separates preference
+heterogeneity from the mechanical increase in total exposure associated with
+project scale. In particular, a restricted model with homogeneous absolute
+risk aversion over total NPV imposes $\alpha_{\gamma1}=1$, rather than
+$\alpha_{\gamma1}=0$, in the effective per-unit parameterization.
+
+I assume an exogenous wholesale price process and a common normally
+distributed belief for the summary of future wholesale prices,
+$r\sim\mathcal{N}(\mu_r,\sigma_r^2)$. CARA utility and normality imply that the
+certainty equivalent of winning is
+\begin{align}
+\label{eq:ce}
+CE_i^{\mathrm{total}}(q_i,p_i)
+=K_i\left\{
+q_i\widetilde{\delta}p_i+(1-q_i)\mu_r-c_i
+-RP_r^{\mathrm{unit}}(1-q_i\mid\gamma_i)
+\right\},
+\end{align}
+where the risk premium per unit of lifetime production is
+\begin{align}
+\label{eq:riskpremiumunit}
+RP_r^{\mathrm{unit}}(1-q_i\mid\gamma_i)
+=(1-q_i)^2\frac{\gamma_i\sigma_r^2}{2}.
+\end{align}
+Equivalently, the total project risk premium is
+\begin{align*}
+RP_r^{\mathrm{total}}(1-q_i\mid A_i,K_i)
+=K_iRP_r^{\mathrm{unit}}(1-q_i\mid\gamma_i)
+=(1-q_i)^2\frac{A_iK_i^2\sigma_r^2}{2}.
+\end{align*}
+The total risk premium increases quadratically with project scale holding
+$A_i$ fixed because the standard deviation of total wholesale-market revenue
+scales with $K_i$. Expressed per unit, the relevant coefficient is
+$\gamma_i=A_iK_i$. Bidders earn a certainty equivalent of zero if they lose
+the auction.\footnote{
+\citet{Ryan2026} also assumes that bidders earn zero profit when they lose in
+long-term purchase agreement auctions. I can allow a loser to earn a total
+certainty equivalent $\Pi_{0i}>0$ that does not depend on the bid
+$(q_i,b_i)$. The framework then identifies per-unit cost inclusive of the
+reservation value, $c_i+\Pi_{0i}/K_i$, but does not separately identify
+$c_i$ and $\Pi_{0i}$. Policy implications remain unchanged as long as a
+counterfactual does not affect these two components differently.
+}
+
+Before the auction, bidders form a common belief about future wholesale
+prices. Upon participating, bidders independently draw private types
+$(A_i,c_i,Capacity_i)$ from a publicly known joint distribution, with
+$A_i>0$, $c_i\in[\underline{c},\overline{c}]$, and
+$Capacity_i\in[\underline{C},\overline{C}]$. Bidders observe $N$ and a
+publicly known distribution of $D$ before bidding. They submit their bids,
+$D$ realizes, and the auction determines purchase-agreement prices according
+to the auction format. I next characterize equilibrium strategies in
+sealed-bid and descending-clock auctions.
+
+
+
+\subsection{Sealed-Bid Auctions}
+\label{sec:sb}
+
+Winners receive purchase agreements at their bid prices, $p_i=b_i$. Bidder
+$i$ chooses $(q,b)$ to maximize
+\begin{align}
+\label{eq:sbobjective-total}
+W_i(b)\,
+U_i\!\left(
+K_i\left\{q\widetilde{\delta}b+(1-q)\mu_r-c_i
+-RP_r^{\mathrm{unit}}(1-q\mid\gamma_i)\right\}
+\,\middle|\,A_i
+\right),
+\end{align}
+where
+\begin{align}
+\label{eq:winprob}
+W_i(b)
+\equiv
+\Pr\!\left(
+\sum_{j\neq i}q_jCapacity_j\I(b_j\leq b)<D
+\right)
+\end{align}
+is his winning probability. Equation~\eqref{eq:utilityequivalence} shows that
+the objective in equation~\eqref{eq:sbobjective-total} is $K_i$ times the
+per-unit objective indexed by $\gamma_i$. Since $K_i$ is fixed and positive,
+this multiplicative term does not affect the optimal bid.
+
+I assume that the winning probability is strictly between zero and one for
+all possible bid prices. A pure-strategy Bayes Nash equilibrium (BNE),
+$\{(q_i^\ast,b_i^\ast)\}_{i=1}^N$, maximizes expected utility for every bidder
+under equilibrium winning-probability functions $W_i^\ast(b)$. I derive a
+sufficient condition for the existence of a monotone pure-strategy BNE by
+applying \citet{Reny2011}. Under the same condition, a symmetric monotone
+pure-strategy BNE exists when bidders are ex-ante symmetric and independently
+draw $(A_i,c_i,Capacity_i)$ from a common distribution.
+
+Bidder $i$'s optimal share satisfies
+\begin{align*}
+q_i^\ast
+=\min\!\left\{
+\max\!\left\{\underline{q},q^{\ast\ast}(b_i^\ast\mid\gamma_i)\right\},1
+\right\},
+\end{align*}
+where the unconstrained optimal share is
+\begin{align}
+\label{eq:optqsb}
+q^{\ast\ast}(b\mid\gamma_i)
+=1-\frac{\mu_r-\widetilde{\delta}b}{\gamma_i\sigma_r^2}.
+\end{align}
+The bidder chooses a 100\% share when the discounted bid price is at least as
+high as the expected wholesale price. As the bid price falls below that
+threshold, he shifts production toward the wholesale market because the
+expected price gain compensates for additional risk. The kink therefore
+identifies $\mu_r$. The interior share-price relationship has slope
+$\widetilde{\delta}/(\gamma_i\sigma_r^2)$, which identifies the effective
+coefficient $\gamma_i$ and, given observed $K_i$, the primitive total-NPV
+coefficient $A_i=\gamma_i/K_i$.\footnote{
+If the bidder's risk-premium function is continuously differentiable,
+strictly increasing, and strictly convex in wholesale-market exposure over
+$[0,1-\underline{q}]$, the optimal share maintains the same monotone shape.
+This more general result clarifies that the share-price relationship identifies
+the marginal risk premium over observed wholesale-market exposures.
+}
+
+% The existing portfolio-choice figure can be inserted here unchanged, with
+% its caption revised to say that the interior slope identifies the effective
+% coefficient gamma_i and hence A_i given observed K_i.
+
+Bidders choose shares as if they care only about expected utility conditional
+on winning because their shares do not affect their winning probabilities.
+Consequently, $W_i^\ast$ and $c_i$ do not enter the optimal share decision
+conditional on $b_i^\ast$. This separation remains crucial for identifying
+risk preferences from portfolio choices before recovering costs from bid
+prices.
+
+The optimal bid price satisfies the same per-unit equation as in the original
+parameterization:
+\begin{align}
+\label{eq:optbsb}
+\underbrace{q_i^\ast\widetilde{\delta}b_i^\ast
++(1-q_i^\ast)\mu_r}_{\text{Expected revenue per unit}}
+&=c_i
++\underbrace{(1-q_i^\ast)^2
+\frac{\gamma_i\sigma_r^2}{2}}_{\text{Risk premium per unit}} \notag\\
+&\quad+
+\underbrace{
+\frac{1}{\gamma_i}
+\ln\!\left(
+-\frac{\gamma_iq_i^\ast\widetilde{\delta}W_i^\ast(b_i^\ast)}
+{dW_i^\ast(b_i^\ast)/db}+1
+\right)
+}_{\text{Markup per unit}}.
+\end{align}
+To see why cost inversion is unchanged, substitute
+$\gamma_i=A_iK_i$ into the first-order condition obtained from
+equation~\eqref{eq:sbobjective-total} and divide total revenues, costs, risk
+premiums, and markups by $K_i$. No additional capacity term remains because
+$K_i$ is fixed when bidder $i$ chooses $(q_i,b_i)$. The equation converges to
+the standard risk-neutral procurement-auction inversion as $A_i\to0$, or
+equivalently $\gamma_i\to0$.
+
+\subsection{Descending-Clock Auctions}
+\label{sec:dc}
+
+I analyze descending-clock auctions in line with \citet{Milgrom1982}'s English
+auction model. Institutionally, these auctions are discrete descending-clock,
+pay-as-bid procedures. For tractability, I treat them as the continuous-clock
+limit in which the outcome is equivalent to a uniform-price auction. Bidders
+choose a cutoff---the lowest price they are willing to accept---as their bid
+price $b_i$, and winners are paid a common clearing price
+$p=b_{M+1:N}$, where $M$ is the number of winners.\footnote{
+In the actual discrete-clock implementation, winners' final submitted prices
+may not coincide because bids adjust in discrete steps with a minimum
+decrement. I examine robustness to the continuous-clock approximation by
+varying the equilibrium clearing-price distribution around values implied by
+winners' observed final submitted prices.
+}
+
+Bidder $i$ chooses $(q,b)$ to maximize
+\begin{align}
+\label{eq:dcobjective-total}
+\int
+\I(b<p)\,
+U_i\!\left(
+K_i\left\{q\widetilde{\delta}p+(1-q)\mu_r-c_i
+-RP_r^{\mathrm{unit}}(1-q\mid\gamma_i)\right\}
+\,\middle|\,A_i
+\right)f_p(p)\,dp.
+\end{align}
+The total-NPV objective is $K_i$ times its normalized per-unit counterpart, so
+the multiplicative scale again does not affect the optimal share or cutoff.
+I assume that the equilibrium clearing price
+$p^\ast=b_{M+1:N}^\ast$ is normally distributed,
+$\mathcal{N}(\mu_{p^\ast},\sigma_{p^\ast}^2)$, and independent of $r$. Under
+the conditions detailed in the Online Appendix, a monotone pure-strategy BNE
+exists, and a symmetric monotone equilibrium exists for ex-ante symmetric
+bidders.
+
+The optimal share is the constrained version of the solution to
+\begin{align}
+\label{eq:focqdc}
+q^{\ast\ast}
+=\left(
+\frac{1}{1+\widetilde{\delta}^2\sigma_{p^\ast}^2/\sigma_r^2}
+\right)
+\left(
+1-
+\frac{\mu_r-
+\widetilde{\delta}\widetilde{\mu}_{p^\ast}
+(q^{\ast\ast},b\mid\gamma_i)}
+{\gamma_i\sigma_r^2}
+\right),
+\end{align}
+where
+\begin{align*}
+\widetilde{\mu}_{p^\ast}(q,b\mid\gamma_i)
+=\mu_{p^\ast}
++\sigma_{p^\ast}\Lambda\!\left(
+\frac{\mu_{p^\ast}-b}{\sigma_{p^\ast}}
+-q\gamma_i\widetilde{\delta}\sigma_{p^\ast}
+\right)
+\end{align*}
+is the effective expected clearing price and $\Lambda$ is the inverse Mills
+ratio. The coefficient entering both expressions is
+$\gamma_i=A_iK_i$. Hence, the descending-clock root problem and numerical
+integration are identical to those under the per-unit formulation after this
+substitution. The optimal cutoff remains the price at which expected utility
+conditional on winning is zero because
+$U_i(0\mid A_i)=0$ and multiplication by $K_i>0$ does not change that
+condition.
+
+The qualitative implications are therefore unchanged. The equilibrium share
+increases continuously with the cutoff price, although the relationship is
+nonlinear. Greater clearing-price variance makes the purchase agreement more
+risky but also raises the value of truncation conditional on winning. The
+effect of $A_i$ is governed by its effective counterpart $\gamma_i=A_iK_i$
+because both purchase-agreement and wholesale-market risks scale with total
+project production. The reparameterization changes the economic
+interpretation of heterogeneity across capacities, but it does not change the
+descending-clock solution for a given value of $\gamma_i$.
+
+\bibliographystyle{aer}
+\bibliography{paper/uncertainty}
+
+\end{document}

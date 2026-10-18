@@ -1,0 +1,727 @@
+\documentclass[10pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{bm}
+\usepackage{bbm}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{subcaption}
+\usepackage{float}
+\usepackage{hyperref}
+\usepackage{enumitem}
+
+\title{Bid-Share GMM and Cost Recovery Audit}
+\author{Konan Hara}
+\date{September 13, 2026}
+
+\begin{document}
+\maketitle
+
+\section{Purpose and Current Status}
+
+This note records the preferred first-stage GMM estimator and the aligned
+second-stage cost-recovery procedure. Both stages have been reproduced on the
+HPCC. The reported standard errors and central 95 percent percentile intervals
+use the completed 200-draw global firm-pairs bootstrap, conditional on the
+observed auctions.
+
+The Step 1 sample contains 741 retained winner observations from 22 auctions.
+Auctions 23 and 24, the two 2021 auctions conducted during the COVID-period
+market disruption, are excluded upstream. The sample contains 600 winners from
+16 sealed-bid auctions and 141 winners from six descending-clock auctions.
+Every retained winner receives equal weight. Auction-recorded capacity defines
+the bid share and its bounds; SIGA-adjusted capacity is not used.
+
+\section{Prior Started Wind Capacity}
+
+Let $K^{W}_{fa}$ denote the total physical assurance of wind projects
+previously awarded to firm $f$ whose contractual delivery periods had begun by
+auction $a$. Each project is counted once at its first award. The construction
+uses only public auction-award information available before auction $a$:
+\[
+K^{W}_{fa}
+=
+\sum_{j:\,f(j)=f}
+C_j^A
+\mathbbm{1}\{a(j)<a,\ t^{\mathrm{start}}_j\leq t_a\}.
+\]
+The level $K^W$ is measured in MW. Its mean is 54.9 MW, its median is zero,
+and its range is 0--421.7 MW in the estimation sample. The preferred regressor
+is
+\begin{equation}
+K^{\log}_{fa}=\log\left(1+\frac{K^W_{fa}}{100}\right).
+\label{eq:klog}
+\end{equation}
+This transformation preserves the structural zero for firms with no prior
+started wind capacity and allows diminishing marginal effects at larger
+histories.
+
+Effective absolute risk aversion is parameterized as
+\begin{equation}
+\gamma_i
+=
+\exp\left(
+\alpha_{\gamma0}
++\alpha_{\gamma K}K^{\log}_{f(i),a(i)}
+\right).
+\label{eq:gamma}
+\end{equation}
+Expected wholesale-market profitability is
+\begin{equation}
+\mu_{r,i}=\alpha_{r0}+\alpha_{r1}m_i,
+\label{eq:mur}
+\end{equation}
+where $m_i$ is forecasted marginal cost of electricity.
+
+\section{Reduced-Form Evidence}
+
+Table \ref{tab:reduced_form} reports OLS regressions of the bid share on
+purchase-agreement price and forecasted marginal cost. Standard errors are
+two-way clustered by auction and firm. For transparency, Column (2) adds prior
+started wind capacity in levels, $K^W_{fa}/100$. The structural model continues
+to use the transformed regressor in equation~\eqref{eq:klog}.
+
+\begin{table}[H]
+\centering
+\caption{Bid share}
+\label{tab:reduced_form}
+\begin{tabular}{lrr}
+\toprule
+& (1) & (2)\\
+\midrule
+Purchase-agreement price
+& 0.01264 & 0.01161\\
+& (0.00418) & (0.00387)\\
+Forecasted marginal cost
+& -0.01762 & -0.01774\\
+& (0.00717) & (0.00685)\\
+Prior started wind capacity / 100 MW
+& & -0.03288\\
+& & (0.01995)\\
+\midrule
+Observations & 741 & 741\\
+Auctions & 22 & 22\\
+Firms & 63 & 63\\
+$R^2$ & 0.400 & 0.420\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The bid-price coefficient remains positive and statistically significant at
+the one-percent level ($p=0.0068$) after including the history measure. The
+history coefficient is negative but does not reach the ten-percent level under
+two-way clustering ($p=0.114$). Its sign nevertheless
+provides suggestive reduced-form motivation for allowing firms with larger
+prior wind portfolios to be more risk tolerant.
+
+\section{GMM Estimator}
+
+For each bidder the estimator uses three conditional moment blocks: the lower
+bound probability, the upper bound probability, and the conditional mean among
+interior bid shares. It does not include a separate variance moment and does
+not apply participant-count weights.
+
+The estimator proceeds through three nested models:
+\begin{enumerate}[label=(\roman*)]
+\item homogeneous $\gamma$ and homogeneous $\mu_r$;
+\item homogeneous $\gamma$ and $\mu_{r,i}$ as in \eqref{eq:mur};
+\item heterogeneous $\gamma_i$ as in \eqref{eq:gamma} and $\mu_{r,i}$ as in
+\eqref{eq:mur}.
+\end{enumerate}
+
+All original-sample optimizations use bounded Nelder--Mead as implemented in
+NLopt. The first model begins with an identity weighting matrix and is
+initialized at $(\gamma,\mu_r,\sigma_\eta)=(0.5,25,0.1)$. Each subsequent
+model begins from the preceding model's second-step estimates and a weighting
+matrix evaluated at those estimates. Within every original-sample model, the
+second GMM step starts from the first-step estimate and uses the moment
+covariance matrix evaluated at that estimate.
+
+The restricted model uses the four instruments
+\[
+\mathbbm{1}\{SB\},\quad
+\mathbbm{1}\{DC\},\quad
+b_i\mathbbm{1}\{SB\},\quad
+b_i\mathbbm{1}\{DC\}.
+\]
+The homogeneous-$\gamma$ model adds $m_i$. The heterogeneous model adds the
+single pooled interaction
+\[
+b_i K^{\log}_{f(i),a(i)}.
+\]
+Applying each instrument to all three moment blocks gives 12, 15, and 18
+moments, respectively.
+
+\section{Structural Estimates}
+
+\begin{table}[H]
+\centering
+\caption{First-stage GMM estimates}
+\label{tab:gmm_estimates}
+\begin{tabular}{lrrrr}
+\toprule
+& \multicolumn{2}{c}{Homogeneous $\gamma$}
+& \multicolumn{2}{c}{Heterogeneous $\gamma$}\\
+\cmidrule(lr){2-3}\cmidrule(lr){4-5}
+& Step 1 & Step 2 & Step 1 & Step 2\\
+\midrule
+$\alpha_{\gamma0}$ & -0.7671 & -0.7083 & -0.5810 & -0.5530\\
+$\alpha_{\gamma K}$ & & & -0.1165 & -0.1205\\
+$\alpha_{r0}$ & 2.2906 & 2.5505 & 1.2814 & 1.0634\\
+$\alpha_{r1}$ & 0.6933 & 0.6814 & 0.7224 & 0.7347\\
+$\alpha_\eta$ & -1.4679 & -1.5532 & -1.6470 & -1.7234\\
+Objective & 0.3404 & 0.3286 & 0.3665 & 0.3650\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+All six optimizations in the nested sequence report
+\texttt{LOCALLY\_SOLVED}, with NLopt status \texttt{FTOL\_REACHED}. The
+homogeneous second-step estimate implies $\gamma=0.492$. Under the final
+heterogeneous estimate, the winner-sample gamma distribution has mean 0.555,
+standard deviation 0.030, median 0.575, 10th percentile 0.512, 90th percentile
+0.575, and range 0.471--0.575. The first-step and second-step means are 0.540
+and 0.555, respectively. The final estimate also implies
+$\widehat\sigma_\eta=0.178$ and an observed-sample $\mu_r$ range of
+23.62--35.89.
+
+The point estimate $\widehat\alpha_{\gamma K}=-0.121$ associates a larger
+prior wind portfolio with lower risk aversion, while leaving the mean close to
+the homogeneous-$\gamma$ estimate. The modest cross-sectional dispersion is
+economically attractive for treating heterogeneous risk aversion as an
+important extension of the homogeneous model rather than as a different
+average-risk specification.
+
+\section{Bootstrap Inference}
+
+The preferred bootstrap conditions on the 22 observed auctions and resamples
+the 63 firms globally with replacement. A firm receives one draw-specific
+multiplicity that applies to all of its observations across auctions and
+auction formats. This preserves within-firm dependence while holding auction
+identities and characteristics fixed. The bootstrap moments are recentered at
+each model's original-sample second-step estimate.
+
+The original estimator remains the two-step GMM estimator described above. In
+the bootstrap, the model-specific second-step weighting matrix is held fixed
+across draws. Each matrix is recalculated from the original sample at the
+corresponding original first-step estimate. The bootstrap therefore captures
+sampling variation in the empirical moments and firm composition without
+re-estimating a potentially ill-conditioned optimal weighting matrix in every
+draw. Under conventional large-cluster GMM asymptotics, estimation of a
+consistent weighting matrix does not affect the estimator's first-order
+distribution under correct specification. The fixed-matrix procedure does not
+reproduce finite-sample variation in the feasible weighting matrix; this is the
+main inferential qualification.
+
+\begin{table}[H]
+\centering
+\caption{Fixed-weight global firm-pairs bootstrap inference}
+\label{tab:gmm_bootstrap_parameters}
+\begin{tabular}{lrrrr}
+\toprule
+& \multicolumn{2}{c}{Homogeneous $\gamma$}
+& \multicolumn{2}{c}{Heterogeneous $\gamma$}\\
+\cmidrule(lr){2-3}\cmidrule(lr){4-5}
+& Estimate & Bootstrap SE & Estimate & Bootstrap SE\\
+\midrule
+$\alpha_{\gamma0}$ & -0.7083 & 0.0678 & -0.5530 & 0.2630\\
+$\alpha_{\gamma K}$ & & & -0.1205 & 0.3369\\
+$\alpha_{r0}$ & 2.5505 & 2.9882 & 1.0634 & 3.7464\\
+$\alpha_{r1}$ & 0.6814 & 0.0829 & 0.7347 & 0.1069\\
+$\alpha_\eta$ & -1.5532 & 0.0836 & -1.7234 & 0.1165\\
+\bottomrule
+\end{tabular}
+\begin{minipage}{0.92\textwidth}
+\footnotesize
+\textit{Notes:} Standard errors are standard deviations across 200 bootstrap
+draws. Firms are resampled globally with replacement; auctions are held fixed;
+moments are recentered; and each model uses its original-sample second-step
+weighting matrix.
+\end{minipage}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{Bootstrap inference for implied risk aversion}
+\label{tab:gmm_bootstrap_gamma}
+\begin{tabular}{lrrr}
+\toprule
+Model & Estimate & Bootstrap SE & Central 95\% interval\\
+\midrule
+Homogeneous $\gamma$, homogeneous $\mu_r$
+& 0.391 & 0.050 & [0.300, 0.492]\\
+Homogeneous $\gamma$
+& 0.492 & 0.033 & [0.427, 0.557]\\
+Heterogeneous $\gamma$ (sample mean)
+& 0.555 & 0.168 & [0.464, 1.028]\\
+\bottomrule
+\end{tabular}
+\begin{minipage}{0.92\textwidth}
+\footnotesize
+\textit{Notes:} Intervals are the 2.5th and 97.5th percentiles of the 200
+bootstrap estimates. The heterogeneous statistic averages $\gamma_i$ over the
+original estimation sample in each draw.
+\end{minipage}
+\end{table}
+
+The central 95 percent percentile interval for $\alpha_{\gamma K}$ is
+$[-1.128,0.324]$; 156 of the 200 estimates are negative. The heterogeneity
+coefficient is therefore imprecise, though its bootstrap distribution leans
+toward the economically expected sign. The heterogeneous-minus-homogeneous
+mean-gamma difference is 0.063, with central interval $[-0.015,0.531]$.
+The central interval for the heterogeneous gamma standard deviation is
+$[0.001,0.395]$, so dispersion is less precisely determined than the mean.
+
+Although $\alpha_{r0}$ has a large marginal standard error, it is strongly
+negatively correlated with $\alpha_{r1}$ across draws ($-0.987$). Consequently,
+the fitted $\mu_r$ endpoints are much more stable: their central intervals are
+approximately [22.10, 24.99] and [32.79, 37.94]. The winner-sample mean full
+wholesale-market risk premium is 8.33, with bootstrap standard error 2.58 and
+central interval [6.92, 15.61].
+
+All 600 bootstrap optimizations are \texttt{LOCALLY\_SOLVED} and terminate
+with \texttt{FTOL\_REACHED}. No estimate is within one percent of a
+computational parameter bound.
+
+\subsection{Step 1 Sensitivity Analysis}
+
+All 18 sensitivity specifications and their continuation steps converge. Table
+\ref{tab:step1_sensitivity} summarizes the ranges for the final heterogeneous
+mean gamma and winner-sample mean full-exposure risk premium.
+
+\begin{table}[H]
+\centering
+\small
+\caption{Step 1 sensitivity ranges}
+\label{tab:step1_sensitivity}
+\begin{tabular}{lrrr}
+\toprule
+Perturbation & Grid & Mean $\gamma$ & Risk premium\\
+\midrule
+Spot-price variance multiplier & 0.5--1.5 & 0.245--2.318 & 8.256--8.690\\
+Spot-price mean shift & $-2$--$2$ SD & 0.451--0.612 & 6.769--9.174\\
+Winning-bid variance multiplier & 0.5--1.5 & 0.548--0.560 & 8.217--8.405\\
+Discount factor $\delta$ & 0.90--0.99 & 0.329--0.882 & 5.252--12.222\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+As in Step 2 below, gamma adjusts sharply to alternative spot-price variances,
+but the implied risk premium remains stable. Results are also insensitive to
+the winning-bid variance. The discount-factor comparison requires a scale
+adjustment because the risk premium is itself a discounted average over the
+contract horizon. Table \ref{tab:step1_delta_scaling} divides each winner's
+risk premium by its auction-specific
+$\widetilde\delta_a=T^{-1}\sum_{t=l_a}^{l_a+T-1}\delta^t$ before averaging.
+
+\begin{table}[H]
+\centering
+\caption{Step 1 discount-factor sensitivity in comparable units}
+\label{tab:step1_delta_scaling}
+\begin{tabular}{rrrr}
+\toprule
+$\delta$ & Mean $\widetilde\delta_a$ & Risk premium
+& Risk premium / $\widetilde\delta_a$\\
+\midrule
+0.90 & 0.309 & 5.252 & 16.754\\
+0.95 & 0.539 & 8.328 & 15.371\\
+0.99 & 0.880 & 12.222 & 13.888\\
+\bottomrule
+\end{tabular}
+\begin{minipage}{0.92\textwidth}
+\footnotesize
+\textit{Notes:} Statistics average equally over the 741 Step 1 winners. The
+last column first divides each observation's risk premium by its own auction's
+$\widetilde\delta_a$ and then averages.
+\end{minipage}
+\end{table}
+
+The unscaled premium changes by a factor of 2.33 between the endpoints, whereas
+the normalized premium changes by a factor of only 1.21. The residual movement
+is reasonable: changing $\delta$ also changes the discounted wholesale-price
+variance and the re-estimated gamma, so the risk premium need not be exactly
+proportional to $\widetilde\delta_a$.
+
+\section{Goodness of Fit}
+
+\begin{table}[H]
+\centering
+\caption{Fit of the final heterogeneous estimate}
+\label{tab:gof}
+\begin{tabular}{lrrrr}
+\toprule
+Sample & Observed mean & Predicted mean & RMSE & Category $L^1$\\
+\midrule
+All & 0.880 & 0.852 & 0.162 & 0.223\\
+Sealed bid & 0.943 & 0.952 & 0.110 & 0.298\\
+Descending clock & 0.615 & 0.429 & 0.294 & 0.095\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The aggregate and sealed-bid means fit closely. The model understates the mean
+descending-clock bid share. Its aggregate DC category frequencies fit better:
+the observed and predicted lower-bound frequencies are 0.362 and 0.399, while
+the observed and predicted interior frequencies are 0.589 and 0.599. The model
+nearly eliminates the relatively rare DC upper-bound outcomes, predicting
+0.002 against 0.050 observed.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{bidshare_gmm_hist_gof.png}
+\caption{Observed and predicted bid-share distributions}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{bidshare_gmm_auction_mean_gof.png}
+\caption{Observed and predicted mean bid shares by auction}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{bidshare_gmm_dc_auction_bounds_gof.png}
+\caption{Descending-clock bound frequencies by auction}
+\end{figure}
+
+\section{Step 2 Alignment and Cost Recovery}
+
+Step 2 uses the sealed-bid auctions to estimate equilibrium winning
+probabilities, invert the bid-price first-order condition for winner costs, and
+simulate the participant distribution of $(\gamma,c)$. It uses the same
+economic definitions and bootstrap sampling unit as Step 1.
+
+\subsection{Auction Capacity and Firm History}
+
+Auction-recorded physical assurance $C_i^A$ defines the portfolio share
+$q_i=Q_i/C_i^A$, the feasible quantity bounds, and the awarded quantity
+$q_iC_i^A$ entering the winning rule. For factual winners, risk aversion is
+evaluated directly using equation~\eqref{eq:gamma}.
+
+For participants, the concomitant argument recovers the joint distribution of
+prior-started wind capacity and current auction capacity. Let $b^*$ denote a
+participant's latent equilibrium bid. Within each auction,
+\[
+f_{K,C,b^*\mid a}(K,C,b)
+=f_{K,C\mid b^*,a}(K,C\mid b)f_{b^*\mid a}(b).
+\]
+The order-statistic likelihood recovers $f_{b^*\mid a}$ from winner bids and
+participant counts. Conditional on $b^*$, winner concomitants identify
+$f_{K,C\mid b^*,a}$ because selection changes the marginal bid distribution,
+not the conditional distribution of characteristics given the bid.
+
+The implementation uses
+\[
+f_{K,C\mid b^*,a}=f_{K\mid C,b^*,a}f_{C\mid b^*,a}.
+\]
+Current auction capacity follows
+\[
+\log C_i^A
+=\beta_{Cb}b_i^*+\beta_{Ca}+\varepsilon_{Ci},
+\qquad \varepsilon_{Ci}\sim\mathcal N(0,\sigma_C^2).
+\]
+For prior-started wind capacity, the censored latent model is
+\[
+(K^{\log}_i)^*
+=\beta_{Kb}b_i^*+\beta_{KC}\log C_i^A+\beta_{Ka}
++\varepsilon_{Ki},
+\qquad
+K^{\log}_i=\max\{0,(K^{\log}_i)^*\},
+\qquad
+\varepsilon_{Ki}\sim\mathcal N(0,\sigma_K^2).
+\]
+A single auction fixed effect governs both the probability mass at $K^W=0$
+and the positive-history distribution. The first six sealed-bid auctions occur
+before any previously awarded wind contract could have started, so $K^W=0$ is
+imposed structurally. Applying
+$\gamma=\exp(\alpha_{\gamma0}+\alpha_{\gamma K}K^{\log})$ induces the joint
+participant distribution of risk aversion, capacity, and equilibrium bids.
+
+The original-sample concomitant models both converge locally. The estimated
+conditional variances are $\widehat\sigma_C^2=0.127$ and
+$\widehat\sigma_K^2=0.537$. The common slopes in the prior-capacity equation,
+$\widehat\beta_{Kb}=-0.046$ and $\widehat\beta_{KC}=0.036$, are imprecisely
+estimated; the model's main role is to preserve the observed mass at zero and
+the joint dependence needed for participant simulation, rather than to assign
+a structural interpretation to these nuisance coefficients.
+
+\subsection{Winner Cost Recovery}
+
+The two sealed-bid auctions without participant counts are excluded from
+winning-probability construction and cost recovery. The factual Step 2 sample
+therefore contains 549 winners from 14 sealed-bid auctions, representing 4,776
+participants and 119,746.7 MW of participant capacity.
+
+\begin{table}[H]
+\centering
+\caption{Capacity-weighted winner outcomes}
+\label{tab:winner_results}
+\begin{tabular}{lrrr}
+\toprule
+Outcome & Estimate & Bootstrap SE & Central 95\% interval\\
+\midrule
+Risk aversion $\gamma$ & 0.561 & 0.208 & [0.456, 1.250]\\
+Optimal bid share & 0.975 & 0.007 & [0.962, 0.989]\\
+Full-exposure risk premium & 8.711 & 3.252 & [7.070, 19.180]\\
+Markup & 0.950 & 0.154 & [0.630, 1.264]\\
+Cost & 23.987 & 0.587 & [22.952, 25.133]\\
+\bottomrule
+\end{tabular}
+\begin{minipage}{0.92\textwidth}
+\footnotesize
+\textit{Notes:} Outcomes average over factual winners using awarded capacity.
+Intervals are the 2.5th and 97.5th percentiles of the bootstrap distribution.
+\end{minipage}
+\end{table}
+
+\subsection{Participant Distribution}
+
+The participant distribution is summarized by a joint linear projection of
+$(\log\gamma,c)$ on the existing polynomial in auction date, lead time, and
+their interactions. With $S_a$ valid simulations in auction $a$, the three
+weights are
+\[
+w^A_{sa}=\frac{1}{S_a},
+\qquad
+w^N_{sa}=\frac{N_a}{S_a},
+\qquad
+w^C_{sa}=TC_a\frac{C_{sa}}{\sum_{r=1}^{S_a}C_{ra}},
+\]
+where $TC_a$ is the observed total capacity of all participants. These
+describe the average auction, average participant, and average MW,
+respectively.
+
+\begin{table}[H]
+\centering
+\small
+\caption{Recovered participant distribution}
+\label{tab:participant_results}
+\begin{tabular}{lrrrr}
+\toprule
+Weighting & Mean & Central 95\% interval & SD & Central 95\% interval\\
+\midrule
+\multicolumn{5}{l}{\textit{Panel A: Risk aversion $\gamma$}}\\
+Equal auction & 0.565 & [0.456, 1.254] & 0.024 & [0.001, 0.274]\\
+Participant & 0.564 & [0.462, 1.208] & 0.024 & [0.001, 0.292]\\
+Capacity & 0.564 & [0.461, 1.210] & 0.024 & [0.001, 0.283]\\
+\addlinespace
+\multicolumn{5}{l}{\textit{Panel B: Cost}}\\
+Equal auction & 27.007 & [26.225, 27.232] & 5.433 & [5.048, 5.508]\\
+Participant & 26.464 & [25.929, 26.758] & 5.364 & [5.051, 5.434]\\
+Capacity & 26.618 & [26.038, 27.006] & 5.468 & [5.184, 5.535]\\
+\bottomrule
+\end{tabular}
+\begin{minipage}{0.92\textwidth}
+\footnotesize
+\textit{Notes:} Cost is discounted to the auction date. Central intervals are
+the 2.5th and 97.5th percentiles across 200 bootstrap draws.
+\end{minipage}
+\end{table}
+
+The three weighting conventions give nearly identical means and standard
+deviations. The point estimate of the gamma standard deviation is about 0.024,
+although its percentile interval is wide and asymmetric; heterogeneity is much
+less precisely estimated than average gamma. The participant-weighted cost
+standard deviation is 5.36 $/MWh$.
+Undiscounted mean costs are 31.286, 30.884, and 31.053 under equal-auction,
+participant, and capacity weights. The estimated correlations between gamma
+and cost are small: $-0.027$, 0.079, and 0.096. Their central intervals,
+respectively $[-0.275,0.291]$, $[-0.231,0.335]$, and $[-0.225,0.334]$, all
+include zero. The average gamma level is therefore much more stable than its
+cross-sectional variance or its covariance with cost. All 200 draws deliver
+finite estimates for every aggregate summary and every linear-projection
+coefficient.
+
+Figures \ref{fig:gamma_trends} and \ref{fig:cost_trends} plot the equal-auction
+linear projections, matching the weighting convention used in the paper's
+existing cost-trend figure. The gamma projection is linear in $\log\gamma$;
+Panel (a) exponentiates the fitted value, while Panel (b) reports the implied
+level effect of an additional lead-time year. The confidence bands are
+pointwise central 95 percent bootstrap percentile intervals.
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{0.49\textwidth}
+\centering
+\includegraphics[width=\textwidth]{step2_gmm_gamma_t_l0.png}
+\caption{Auction-date trend at zero lead time}
+\end{subfigure}
+\hfill
+\begin{subfigure}{0.49\textwidth}
+\centering
+\includegraphics[width=\textwidth]{step2_gmm_gamma_l_by_t.png}
+\caption{Lead-time effect by auction date}
+\end{subfigure}
+\caption{Linear projection of participants' risk aversion}
+\label{fig:gamma_trends}
+\begin{minipage}{0.94\textwidth}
+\footnotesize
+\textit{Notes:} Equal-auction projection. Shaded regions are pointwise central
+95 percent intervals from 200 global firm-pairs bootstrap draws.
+\end{minipage}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{0.49\textwidth}
+\centering
+\includegraphics[width=\textwidth]{step2_gmm_cost_t_l0.png}
+\caption{Auction-date trend at zero lead time}
+\end{subfigure}
+\hfill
+\begin{subfigure}{0.49\textwidth}
+\centering
+\includegraphics[width=\textwidth]{step2_gmm_cost_l_by_t.png}
+\caption{Lead-time effect by auction date}
+\end{subfigure}
+\caption{Linear projection of participants' costs}
+\label{fig:cost_trends}
+\begin{minipage}{0.94\textwidth}
+\footnotesize
+\textit{Notes:} Equal-auction projection. The undiscounted specification in
+Panel (b) divides cost by $\delta^{l_a}$ before projection. Shaded regions are
+pointwise central 95 percent intervals from 200 global firm-pairs bootstrap
+draws.
+\end{minipage}
+\end{figure}
+
+The fitted gamma trend declines modestly from 2010 and is nearly flat over
+2012--2015, but its confidence band is broad. The lead-time effect on gamma is
+close to zero throughout. In contrast, the cost projection retains the marked
+U-shape in auction date and the inverse-U lead-time pattern found in the paper;
+both are much more precisely estimated.
+
+\subsection{Step 2 Bootstrap Diagnostics}
+
+The Step 2 bootstrap reproduces the Step 1 global firm-pairs draw. Firm
+multiplicities enter the bid-price likelihood and concomitant models as
+frequency weights and also enter the winner summaries. A draw can assign zero
+weight to all observed winners in an auction. Such an auction is inactive in
+that draw, and its nuisance parameters, cost inversions, and distributional
+projection observations are omitted rather than replaced by original-sample
+estimates.
+
+All 200 bid-distribution problems converge locally. For the censored
+prior-capacity model, 87 draws reach Ipopt's preferred local tolerance and 113
+reach its acceptable tolerance; one draw uses the deterministic retry. No
+conditional variance reaches its computational bound. The number of active
+sealed-bid auctions ranges from 12 to 14. In 121 draws all 14 auctions are
+active, 74 draws contain 13, and five draws contain 12. The corresponding
+draws recover 549, 546, and 536 winners, respectively. This variation is the
+intended conditional-on-auctions
+firm-resampling design. Every aggregate statistic in Table
+\ref{tab:participant_results} is estimable in all 200 draws.
+
+\subsection{Sensitivity Analysis}
+
+All 18 Step 2 sensitivity specifications recover all 549 eligible winners.
+The main patterns are summarized in Table \ref{tab:sensitivity}; ranges are
+taken over each stated grid.
+
+\begin{table}[H]
+\centering
+\small
+\caption{Step 2 sensitivity ranges for capacity-weighted winners}
+\label{tab:sensitivity}
+\begin{tabular}{lrrrr}
+\toprule
+Perturbation & Grid & Mean $\gamma$ & Risk premium & Mean cost\\
+\midrule
+Spot-price variance multiplier & 0.5--1.5 & 0.247--2.342 & 8.637--9.086 & 23.742--24.399\\
+Spot-price mean shift & $-2$--$2$ SD & 0.457--0.617 & 7.091--9.577 & 23.941--24.009\\
+Winning-bid variance multiplier & 0.5--1.5 & 0.554--0.566 & 8.597--8.790 & 23.985--23.989\\
+Discount factor $\delta$ & 0.90--0.99 & 0.332--0.891 & 5.661--12.416 & 14.066--38.319\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Changes in assumed spot-price variance are largely offset by changes in
+estimated gamma, leaving the economically relevant risk premium and recovered
+cost comparatively stable. The winning-bid variance has little effect. For the
+discount-factor comparison, Table \ref{tab:step2_delta_scaling} places the risk
+premium in comparable annualized price units.
+
+\begin{table}[H]
+\centering
+\small
+\caption{Step 2 discount-factor sensitivity in comparable units}
+\label{tab:step2_delta_scaling}
+\begin{tabular}{rrrrrr}
+\toprule
+$\delta$ & Mean $\widetilde\delta_a$ & Risk premium
+& Risk premium / $\widetilde\delta_a$ & Mean cost & Premium / cost\\
+\midrule
+0.90 & 0.320 & 5.661 & 17.528 & 14.066 & 0.402\\
+0.95 & 0.550 & 8.711 & 15.817 & 23.987 & 0.363\\
+0.99 & 0.883 & 12.416 & 14.057 & 38.319 & 0.324\\
+\bottomrule
+\end{tabular}
+\begin{minipage}{0.92\textwidth}
+\footnotesize
+\textit{Notes:} Capacity-weighted winner statistics. The normalized premium
+divides each winner's risk premium by its auction-specific
+$\widetilde\delta_a$ before averaging.
+\end{minipage}
+\end{table}
+
+The raw premium changes by a factor of 2.19 across the endpoint discount
+factors, but the normalized premium changes by only a factor of 1.25. The
+premium-to-cost ratio also moves much less than the component levels. Thus most
+of the apparent sensitivity is the expected NPV scaling, rather than an
+economically implausible change in the underlying price of risk. The remaining
+movement reflects the nonlinear effect of $\delta$ on wholesale-price variance
+and re-estimation of gamma.
+
+\section{Reproducibility Files}
+
+\begin{itemize}
+\item \texttt{code/data\_processing/estimation\_prep.R}: estimation data and
+prior started wind capacity;
+
+\item \texttt{code/estimation/step1.jl}: original-sample and bootstrap GMM;
+
+\item \texttt{code/estimation/step1\_result.jl}: bootstrap standard errors and
+implied risk-aversion statistics;
+
+\item \texttt{code/estimation/step1\_sa.jl}: Step 1 sensitivity estimates;
+
+\item \texttt{code/estimation/step2\_dist.jl} and
+\texttt{step2\_dist\_func.jl}: bid-price, capacity, and prior-capacity
+concomitant distributions;
+
+\item \texttt{code/estimation/step2.jl} and \texttt{step2\_func.jl}: winning
+probabilities, cost inversion, and original/bootstrap outputs;
+
+\item \texttt{code/estimation/step2\_sa.jl}: Step 2 sensitivity outputs;
+
+\item \texttt{code/estimation/step2\_result.jl}: bootstrap standard errors and
+aggregate winner and participant summaries;
+
+\item \texttt{notes/gmm/step1\_gmm\_reduced\_form.R}: reduced form;
+
+\item \texttt{notes/gmm/step1\_gmm\_gof.jl} and
+\texttt{step1\_gmm\_gof.R}: predictive diagnostics;
+
+\item \texttt{notes/gmm/step2\_gmm\_results.R}: participant-distribution
+summaries, trend figures, and discount-factor normalization;
+
+\item \texttt{notes/gmm/step2\_gmm\_*.csv} and
+\texttt{step2\_gmm\_*.png}: note-specific Step 2 tables and figures;
+
+\item \texttt{output/result/params1\_hat.csv},
+\texttt{params1\_result.csv}, and \texttt{params1\_status.csv}: Step 1
+estimates, bootstrap inference, and optimization statuses;
+
+\item \texttt{output/result/params2\_dist\_result.csv} and
+\texttt{params2\_dist\_status.csv}: Step 2 nuisance distributions;
+
+\item \texttt{output/result/gamma\_c\_winner\_result.csv}: winner recovery;
+
+\item \texttt{output/result/gamma\_c\_summary\_result.csv} and
+\texttt{gamma\_c\_lp\_result.csv}: participant summaries and projections;
+
+\item \texttt{output/result/step2\_status.csv}: Step 2 recovery diagnostics.
+\end{itemize}
+
+\end{document}

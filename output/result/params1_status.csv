@@ -1,0 +1,7 @@
+model,step,raw_status,termination_status,optimizer,objective_evaluations,objective_value,moment_count,maximum_iterations,maximum_evaluations
+homo_gamma_mur,first,FTOL_REACHED,LOCALLY_SOLVED,NLopt Nelder-Mead,158,1.1263938757339635,12,,2000
+homo_gamma_mur,second,FTOL_REACHED,LOCALLY_SOLVED,NLopt Nelder-Mead,183,0.3069534171563939,12,,2000
+homo_gamma,first,FTOL_REACHED,LOCALLY_SOLVED,NLopt Nelder-Mead,219,0.3403785466676648,15,,2000
+homo_gamma,second,FTOL_REACHED,LOCALLY_SOLVED,NLopt Nelder-Mead,174,0.32855197559776195,15,,2000
+hetero,first,FTOL_REACHED,LOCALLY_SOLVED,NLopt Nelder-Mead,276,0.36652810428661464,18,,2000
+hetero,second,FTOL_REACHED,LOCALLY_SOLVED,NLopt Nelder-Mead,312,0.36498938744649756,18,,2000
